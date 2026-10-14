@@ -1,0 +1,25 @@
+Q9: multiple reviews per member
+Answer: I agree - let's restrict to one review per member per production. No reason to suffer the complications it brings.
+
+Q10: how to distinguish unique productions of the same work
+I agree with your recommendation: we'll provide a system-generated unique ID, they can call it whatever they want.
+
+Q11: I agree with your recommendation.  We offer them a list of existing works to link to, but if they don't accept that we will just create a new Work silently for them. And admins get a merge tool for fixing it later.
+
+Q12: I accept your recommendation, with one caveat: I expect members may write reviews for shows they've seen in the past where they don't remember the specific venue, but they do know which city they saw it in. How would that be handled?  This is essentially an "unknown" venue name with a city and county location.
+
+Q13: I agree, let's not manage individual performances.  Engagement is detailed enough.
+
+Q14: I prefer option (ii), which is that only the Production's creating curator can edit the Production (and of course any "admin"). Eventually that will be the model as well - there is an "owner" of the Production record.  For now, the creating Curator becomes the initial Owner.
+
+Q15: I agree with your recommendation on Review states.  Three state: Draft, Published, Withdrawn.  LIkes and comments are kept while withdrawn. This way,  toggling a review between Published and Withdrawn (and back again) doesn't lose anything.   And I like your "Removed" state as well.  And an "edited" marker as well.
+
+Q16: I agree with your recommendation on commenting.  "Anyone" means any unblocked member, and the setting only gates new comments; existing ones stay.  I agree, commenters can delete their own comments, and not edit their comments.  (They can always delete and re-comment if they need to).
+
+Q17: I agree.  Yes, the act of "rating" is a public activity.
+
+Q18: I agree: following plus a feed comes after the ability to create productions and rate/review them.  And blocking is not necessary during invite-only phase where all members are considered friendly. Blocking comes before opening to the public.
+
+Q19: I agree, this is a simple way to enforce invite-only.
+
+Q20: I do not expect a "Cast" object for the foreseeable future.  I believe this site can be successful without needing that level of detail. Individual cast members can be discussed in reviews.  Initially, this site is not intended to be an "IMDB" type of site that becomes a history of theatrical shows.  It could perhaps go that direction, but that is not the intent; it is the interaction of theatre enthusiasts discussing productions that is the driving intention.

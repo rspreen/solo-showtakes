@@ -1,0 +1,21 @@
+Question Q1: Is a Work a first-class thing?
+Answer: Initially, we do not need to expose the higher-level "work" concept through the user interface.  Building the "work" concept requires more effort for "productions" to be created, i.e. to be accurately tied to a higher-level "work" object.  However, ultimately it will be nice to be able to search for all productions of a certain work, and see the ratings of them, so it makes sense to introduce the "work" object and its relationships internally.
+
+Question Q2: Where is the boundary of one production?
+Your answer is correct: these entities are all separate productions: Hamilton on Broadway, Hamilton in the West End, the Hamilton US national tour, and a 2026 revival of a show that closed in 2010.  A "revival" is by definition a new production.
+
+And yes, a production that opens off-broadway but transfers to Broadway with the same team (producers, cast, director, etc.) is still the same production, it's just that its run continued at a different location.  Yes, let's define "engagement" as "a production's stay at one venue over a date range".
+
+Note that it is optional for a "production" to specify its engagements on our site, though we want to support as much detail as they will provide us.  A touring production would, for example, upload their entire itinerary (list of engagements, with locations and dates).  But minimally we could define a production with only a  "unique production name" (since all productions will need a unique defining name separate from the Work), a starting year, and an optional text-paragraph description of the production.
+
+Question Q3: sub-decisions: (1) yes, a member can review without rating.  (2) Can a member write multiple reviews of a production?  I do not have a strong feeling about this; since I have no reason to deny them this ability, unless some reason arises to make this difficuilt, let's say that they can indeed write multiple reviews.  (3) the rating is a single field that the member can apply to the production, it is unrelated to any reviews the member might create.
+
+Question Q4: Yes, let's use the term "curator" for "member authorized to create shows".
+
+Question Q5: I agree with your recommendation, during the invite-only phase, let's say that any member with the "curator" role create show entries, and we will grant this role liberally to everyone.  There is no approval queue.  The act of creating and editing show entries will evolve in the future.
+
+Question Q6: I agree with your word canonicalization for Visitor, Member, and Comment.  (And no longer using "user" or "reply".)
+
+Question Q7: I agree with your recommendation for concerts and comedy. Let's keep it very simple for now, since they are not the main focus of our target visitors.
+
+Question Q8: I agree with your recommendations on "Blocking".

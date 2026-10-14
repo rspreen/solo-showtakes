@@ -1,0 +1,25 @@
+Q31: I agree.  Or maybe the work doesn't need the date of creation, and dates only go on productions.
+
+Q32: I agree, members can change their handles freely, with no limits.
+
+Q33: I agree, for first admin.
+
+Q34: My instinct is to build an internal API, to create methods for all operations that come from the user interface: "create a production", "create a review", "set a rating from this member to this production", etc.  That makes for easier testing as well, as we can run scenarios through the API.  This does not mean we will be exposing these methods via the internet, but it does create a layer of separation internally for us to enable better testing and modularity.  I believe this still allows us to have a single application running in Next.js that receives the requests from the website, calls our internal API methods, which then call the database.   This also leaves us in a better position if we do decide to expose an API in the future.
+
+Q35:  Postgres through Drizzle is acceptable.
+
+Q36: I agree with using Better Auth
+
+Q37: I agree, it can run locally on my MacMini for testing and evaluation (with Postgres running in a container in Orbstack).  Vercel seems reasonable to get started, during alpha/beta/free usage.  I assume it would be easy to move elsewhere at that time if there are cheaper places to run commercially.
+
+Q38: I agree, for local testing just printing emails to a local inbox tool.  It looks like Resend or Postmark are acceptable.
+
+Q39: I agree.
+
+Q40: I agree with using GeoNames as a starting point, with admin ability to add more.
+
+Q41: I agree with the testing strategy.
+
+Q42: I agree with your tasks document.
+
+Q43: I agree we should create some possible prototype looks as a separate discussion.  Can you explain the basic UI architecture?  Would you use React or some other interactive framework along with Tailwind?

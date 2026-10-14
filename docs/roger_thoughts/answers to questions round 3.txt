@@ -1,0 +1,20 @@
+Q21: I agree, the engagement has a city - which comes from a fixed reference list - and venue name is optional.
+
+Q22: Let's keep it simple initially, so just one owner per production. We will learn what problems, if any, are caused by this, and this learning will help us address the problem for the future, when there is an official producer who owns the production record; it will still be the case of a single owner. In that future we can create some sort of "message to the producer" queue.
+
+Q23: Agree, admins own works.  Works should be simple objects, essentially title, author, and date of creation.
+
+Q24: I agree with your recommendation about deletion of existing accounts or productions.
+
+Q25: Correct, admin is simply a role on a member. Of course, there is the initialization issue that there needs to be an initial "admin" member already established.
+
+Q26: Agree. Let's implement the format rules from day one, but the limitations on editing them are not necessary until much later, they do not need to be implemented initially.
+
+Q27: I agree, let's move password reset into the MVP.   And we will NOT implement "sign in with Google/Apple". I do not like that feature, I prefer the simplicity that prospective members need to offer up a single email address of their choosing, and we can process our own login and validation without any connection to 3rd parties like Apple or Google.
+
+Q28: I agree, we want images from the start. That is part of the artistic joy of theatre productions.  Both letterboxd and goodreads are dealing with the same issues, so this should be solvable.
+
+Q29: I suggest rating average be displayed numerically as an integer and 2 decimal digits. I agree, "top rated" is a bit ambiguous, since the count of ratings is significant as well.
+
+
+Q30: technology stack.  I am personally more familiar with python for website backends; I am familiar with Django, and while it is very robust and old, I think of it as being not very flexible. I don't know if we should be tied down to its templating language for our user interface.  For this reason, I think Typescript/Next.js gives us more flexibility to discover engaging and fun user interfaces, which are important to make the interaction enjoyable.

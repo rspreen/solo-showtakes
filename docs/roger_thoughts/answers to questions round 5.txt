@@ -1,0 +1,21 @@
+Q44: I agree. One question is whether the API methods take objects or ids: if it takes the actual Member object, that means the member object must be completely read from the database and assembled for any API method, whereas if it is just the internal ID, possibly more optimal SQL methods can be written to perform the task.  However, perhaps the use  of the Drizzle ORM makes "always objects" a more convenient strategy.
+
+Q45: I agree.  The option of "members I follow" can come later.
+
+Q46: I agree, you cannot like your own review.  And I agree, comments do not get likes.  Those length limits are acceptable.  And yes, in MVP, just "most liked" or "most recent".
+
+Q47: I agree with your recommendation.
+
+Q48: Yes, I concur.
+
+Q49: Yes, use the same city reference list.
+
+Q50: Yes, I concur completely.
+
+Q51: Yes, lists are not part of MVP.  It comes after following is implemented.  It is unclear whether a list can hold a "work" in addition to a production, but it is not important to answer that now.  We will investigate lists more thoroughly in the future.
+
+Q52: I agree with your "After the MVP" though I would put Lists at the end, i.e., after "location browsing" and top-rated ordering.  Lists can be deferred to well after public opening of the site, they are not critical to the site's basic success.
+
+I agree with your "before public signup" list.
+
+I agree with your "date set" list, though I would move "Lists" to this category, and I would move scraping tools to the head of this list, as a larger inventory of things to look at, even without reviews, will inspire more member interaction, and be more impressive to Visitors.
