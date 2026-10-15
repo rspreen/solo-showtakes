@@ -1,0 +1,178 @@
+# Tasks
+
+Ordered work list for Showtakes. Reorder freely; work is taken from the top of **Now**.
+Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions are in [adr/](./adr/).
+
+## Now: MVP (invite-only)
+
+### Foundations
+
+1. **Project skeleton**
+   - Next.js app in TypeScript strict mode, managed with pnpm.
+   - Tailwind and shadcn/ui installed; one placeholder home page.
+   - Lint, type check, Vitest, and Playwright wired up.
+   - GitHub Actions runs all checks on every push.
+   - Done when: `pnpm dev` serves the placeholder and CI is green.
+
+2. **Local database and migrations**
+   - Postgres for development and tests runs in OrbStack via Docker Compose.
+   - Drizzle schema and SQL migration files are committed.
+   - Integration tests run against a throwaway database.
+   - Done when: one command migrates a fresh database, and a sample integration test creates and cleans up its own data.
+
+3. **Operations layer skeleton** (ADR 0002)
+   - An Actor type (Visitor, or Member id plus roles).
+   - Database passed in rather than imported.
+   - One convention for permission refusals.
+   - One example operation with unit and integration tests.
+   - Done when: a test reads as "as member A, do X; expect refusal" and passes.
+
+4. **Email sending**
+   - A mail interface with two adapters: a local inbox tool for development and Resend or Postmark for production.
+   - Done when: a test email from local development appears in the local inbox and nowhere else.
+
+5. **Accounts and the invite allowlist**
+   - Better Auth with email and password, email verification, password reset, and long-lived sessions.
+   - Signup works only for emails on the allowlist.
+   - Handle is chosen at signup and must meet the format rules: 2-30 characters, letters, numbers, periods and underscores, starting with a letter or number, no consecutive periods, lowercased, unique.
+   - Done when: an allowlisted email can sign up, verify, log out, reset the password, and log back in; a non-listed email is refused; handle rules are covered by unit tests.
+
+6. **Roles and the first Admin**
+   - Curator and Admin roles on Member.
+   - A script that promotes a Member to Admin by email.
+   - Done when: the script works locally, and role checks are enforced in the operations layer.
+
+7. **First deploy**
+   - Vercel, Neon Postgres, Cloudflare R2, and the email provider, with DNS for showtakes.com.
+   - A preview deployment per branch.
+   - Done when: production signup works end to end on the real domain.
+
+8. **Backups**
+   - Point-in-time restore enabled on the database.
+   - A nightly dump copied to separate storage.
+   - One rehearsed restore, written up.
+   - Done when: the rehearsal has been performed before any tester is invited.
+
+### Reference data and media
+
+9. **City reference list**
+   - GeoNames cities above roughly 15,000 population imported by script.
+   - A City typeahead operation.
+   - Admins can add a City.
+   - Done when: typing "new y" offers New York City.
+
+10. **Image storage**
+    - A storage interface backed by a local folder in development and R2 in production.
+    - Uploads are size-limited and resized to a few fixed sizes.
+    - Done when: an uploaded image is served at each size in both environments.
+
+### Members
+
+11. **Profile**
+    - Edit display name (up to 30 characters, any characters), bio, avatar, City, default comment setting (anyone or just you), and handle (freely changeable).
+    - Public profile page by handle.
+    - Done when: a Visitor can view a Member's profile.
+
+12. **Admin: members and allowlist**
+    - Admin screens to list, create (bypassing verification), edit, and delete Members; grant and revoke roles; manage the allowlist.
+    - Done when: you can invite a tester and make them a Curator entirely through the interface.
+
+### Catalog
+
+13. **UI prototypes** (separate session)
+    - Two or three throwaway looks for the home page and the Production page.
+    - Done when: one direction is chosen.
+
+14. **Create and edit Productions**
+    - A Curator creates a Production.
+    - The title typeahead links to an existing Work or silently creates one (title, creators, Category).
+    - Dates: start year required; start month, end year, and end month optional.
+    - Optional fields: producer, description, website, image.
+    - The creator becomes the Owner, and only the Owner or an Admin can edit.
+    - Done when: the permission rules are covered by operation tests.
+
+15. **Engagements and Venues**
+    - The Owner adds Engagements: City required, Venue optional (typeahead, created inline, must be in the same City), dates optional.
+    - Done when: a touring Production can list several Engagements.
+
+16. **Production page**
+    - Image, title with qualifier (producer, City, start year), description, website, and Engagements.
+    - Rating summary and reviews are added by later tickets.
+    - Done when: the page is viewable by Visitors.
+
+17. **Browse and search**
+    - Lists of recently added and recently reviewed Productions.
+    - Fuzzy title search in Postgres.
+    - Done when: a misspelled title still finds the Production.
+
+### Opinions
+
+18. **Ratings**
+    - A Member sets or clears one Rating per Production (half to five stars).
+    - The Production page shows the mean to two decimals, the count, stars, and a distribution chart.
+    - Ratings are public on the Member's profile.
+    - Done when: the average recalculates correctly in tests.
+
+19. **Reviews**
+    - One Review per Member per Production, up to 15,000 characters.
+    - States: Draft, Published, Withdrawn.
+    - An "edited" marker after publishing.
+    - The Production page lists Published reviews, collapsed with "more", sorted by most liked (default) or most recent.
+    - Done when: the state transitions are covered by tests.
+
+20. **Likes**
+    - Toggle a Like on another Member's Published Review; no self-likes.
+    - The count is shown on the Review.
+    - Done when: the rules are covered by operation tests.
+
+21. **Comments**
+    - A flat list per Review, up to 2,000 characters.
+    - Per-Review setting (anyone or just you), defaulting from the profile.
+    - The setting gates new Comments only.
+    - The author can always comment; commenters can delete their own; the Review's author can delete any Comment on it.
+    - Done when: the rules are covered by operation tests.
+
+22. **My reviews**
+    - A Member's own list of Reviews in every state, sortable by Production, date written, or most recent Comment.
+
+### Administration and lifecycle
+
+23. **Admin: catalog and moderation**
+    - Edit any Production, reassign its Owner, and delete it.
+    - Mark a Review or Comment as Removed.
+
+24. **Deletion rules**
+    - Account deletion erases the Member's Ratings, Reviews, Comments, and Likes, and their Productions become admin-owned.
+    - An Owner can delete a Production only while it has no Ratings or Reviews.
+
+25. **Merge script**
+    - Merge duplicate Works or Venues, moving everything attached to them.
+
+26. **Logged-in home page**
+    - Sign out, plus whatever the chosen prototype shows for a logged-in Member.
+
+## Next: after the MVP
+
+- Follow, and the activity feed of followed Members' Ratings, Reviews, and Comments
+- "Members you follow" as a comment setting; "most followed reviewers" sort
+- Location browsing ("playing near me")
+- Weighted "top rated" ordering
+
+## Before public signup
+
+- Block (semantics settled; see CONTEXT.md)
+- Reporting Comments, and a moderation queue
+- Handle and display-name change limits, and the 14-day hold on an old handle
+- Rate limiting and spam defences
+- Terms of use, privacy policy, and an image takedown contact
+- "Message the Owner" queue
+
+## Later: no date set
+
+- Scraping or importing tools to populate the catalog (check each source's terms first)
+- Lists (whether a List can hold Works is still open)
+- Advertising
+- Ticket referral buttons
+- Verified Producer accounts
+- Change history on catalog entries
+- Public API or mobile app
