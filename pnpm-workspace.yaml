@@ -1,0 +1,13 @@
+# pnpm settings for this repository.
+#
+# minimumReleaseAge: pnpm refuses package versions published less than this
+# many minutes ago (10080 = 7 days). Most malicious releases of popular
+# packages are spotted and pulled within days, so waiting a week is a cheap
+# defence against supply-chain attacks. Avoid adding exceptions; wait instead.
+minimumReleaseAge: 10080
+
+# Packages allowed to run install scripts. Both are disabled for now:
+# sharp (image processing) will be enabled in ticket 10 when we resize images.
+allowBuilds:
+  sharp: false
+  unrs-resolver: false
