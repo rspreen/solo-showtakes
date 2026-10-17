@@ -7,7 +7,7 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
 
 ### Foundations
 
-1. **Project skeleton**
+1. **Project skeleton** (done 2026-10-15)
    - Next.js app in TypeScript strict mode, managed with pnpm.
    - Tailwind and shadcn/ui installed; one placeholder home page.
    - Lint, type check, Vitest, and Playwright wired up.
@@ -169,7 +169,7 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
 
 ## Later: no date set
 
-- Scraping or importing tools to populate the catalog (check each source's terms first)
+- Scraping or importing tools to populate the catalog (check each source's terms first). When this starts, split the repo into a pnpm-workspace monorepo (`apps/web`, `apps/scraper`, `packages/core` for domain, operations, and db) so the scraper reuses the same rules; the import-boundary lint rule keeps that split a matter of moving folders.
 - Lists (whether a List can hold Works is still open)
 - Advertising
 - Ticket referral buttons
