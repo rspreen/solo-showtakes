@@ -10,6 +10,26 @@ jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+
+    # Postgres for integration tests, matching compose.yaml (same image and
+    # host port), so DATABASE_URL is identical to .env.example.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: showtakes
+          POSTGRES_PASSWORD: showtakes
+          POSTGRES_DB: showtakes
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U showtakes -d showtakes"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 15
+    env:
+      DATABASE_URL: postgres://showtakes:showtakes@localhost:5433/showtakes
+
     steps:
       - uses: actions/checkout@v7
 
@@ -28,6 +48,12 @@ jobs:
 
       - run: pnpm lint
       - run: pnpm typecheck
+
+      # Proves the committed migrations apply cleanly to a fresh database.
+      - run: pnpm db:migrate
+
+      # Unit and integration tests; integration tests create their own
+      # throwaway database on the Postgres service above.
       - run: pnpm test
 
       # Browser tests run against the production build.

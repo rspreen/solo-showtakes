@@ -1,0 +1,30 @@
+# Local services for development and tests, run with `pnpm db:up`
+# (docker compose, served by OrbStack on macOS). Production uses Neon Postgres
+# instead (ticket 7), so nothing here is deployed.
+#
+# Tests do not use the `showtakes` database below: each `pnpm test` run
+# creates its own throwaway database on this same server (see
+# src/db/testing/global-setup.ts).
+name: showtakes
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: showtakes
+      POSTGRES_PASSWORD: showtakes
+      POSTGRES_DB: showtakes
+    ports:
+      # Host port 5433, not the default 5432, so this can run alongside other
+      # projects' Postgres containers. Must match DATABASE_URL in .env.
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U showtakes -d showtakes"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+volumes:
+  postgres-data:

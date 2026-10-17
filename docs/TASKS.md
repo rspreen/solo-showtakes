@@ -14,7 +14,7 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
    - GitHub Actions runs all checks on every push.
    - Done when: `pnpm dev` serves the placeholder and CI is green.
 
-2. **Local database and migrations**
+2. **Local database and migrations** (done 2026-10-17)
    - Postgres for development and tests runs in OrbStack via Docker Compose.
    - Drizzle schema and SQL migration files are committed.
    - Integration tests run against a throwaway database.

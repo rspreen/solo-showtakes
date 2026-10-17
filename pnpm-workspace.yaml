@@ -6,8 +6,11 @@
 # defence against supply-chain attacks. Avoid adding exceptions; wait instead.
 minimumReleaseAge: 10080
 
-# Packages allowed to run install scripts. Both are disabled for now:
+# Packages allowed to run install scripts. All are disabled for now:
 # sharp (image processing) will be enabled in ticket 10 when we resize images.
+# esbuild (used by drizzle-kit) gets its binary from a platform-specific
+# optional dependency, so its install script is not needed.
 allowBuilds:
+  esbuild: false
   sharp: false
   unrs-resolver: false
