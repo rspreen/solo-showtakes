@@ -47,6 +47,10 @@ each `pnpm test` run creates, migrates, and drops (`src/db/testing/`). Test
 files share it and run in parallel, so each test creates its own uniquely
 named data, deletes it afterwards, and never assumes a table is empty.
 
+To inspect what a failing test left behind, run `KEEP_TEST_DB=1 pnpm test`;
+the database is kept and its name printed. Test databases older than a day,
+including ones left by killed runs, are dropped at the start of each run.
+
 ## Layout
 
 | Path              | Contents                                                  |
