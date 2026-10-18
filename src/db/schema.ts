@@ -1,25 +1,13 @@
 /**
- * Database schema: the single source of truth for every table.
+ * Every database table, gathered from the areas of `src/core/`.
  *
- * Drizzle reads this file in two ways:
- * - `pnpm db:generate` (drizzle-kit) compares it with the committed migrations
- *   in `src/db/migrations/` and writes a new SQL migration for any difference.
- * - Application code imports these table objects to build type-checked
- *   queries (`db.select().from(allowlistEntry)`).
+ * Tables are defined next to the code that uses them (`src/core/<area>/
+ * schema.ts`, ADR 0004). This file re-exports them all so that drizzle-kit
+ * (drizzle.config.ts) sees the whole database when generating migrations,
+ * and `client.ts` can give the Database type knowledge of every table.
+ * Add one line here when an area gets its first table.
  *
- * Never edit the database by hand; change this file and generate a migration.
- * Only `src/operations/` should query these tables (ADR 0002).
+ * Imports are relative, not `@/`, because drizzle-kit loads this file
+ * outside the app's build and does not know the `@/` alias.
  */
-import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
-
-/**
- * Email addresses allowed to sign up while the site is invite-only.
- * Ticket 5 enforces the rule at signup and normalises emails (lowercasing)
- * before they are stored here.
- */
-export const allowlistEntry = pgTable("allowlist_entry", {
-  email: text("email").primaryKey(),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-});
+export * from "../core/people/schema";

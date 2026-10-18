@@ -20,7 +20,7 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
    - Integration tests run against a throwaway database.
    - Done when: one command migrates a fresh database, and a sample integration test creates and cleans up its own data.
 
-3. **Operations layer skeleton** (ADR 0002)
+3. **Operations layer skeleton** (ADR 0002, ADR 0004; done 2026-10-17)
    - An Actor type (Visitor, or Member id plus roles).
    - Database passed in rather than imported.
    - One convention for permission refusals.
@@ -169,7 +169,7 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
 
 ## Later: no date set
 
-- Scraping or importing tools to populate the catalog (check each source's terms first). When this starts, split the repo into a pnpm-workspace monorepo (`apps/web`, `apps/scraper`, `packages/core` for domain, operations, and db) so the scraper reuses the same rules; the import-boundary lint rule keeps that split a matter of moving folders.
+- Scraping or importing tools to populate the catalog (check each source's terms first). When this starts, split the repo into a pnpm-workspace monorepo (`apps/web`, `apps/scraper`, `packages/core` from `src/core` and `src/db`) so the scraper reuses the same rules; the import-boundary lint rule keeps that split a matter of moving folders.
 - Lists (whether a List can hold Works is still open)
 - Advertising
 - Ticket referral buttons

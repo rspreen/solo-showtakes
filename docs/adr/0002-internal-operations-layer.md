@@ -10,4 +10,4 @@ The layer is not reachable over the network today; it is an internal boundary, n
 - The things being acted on are passed as ids (`setRating(actor, productionId, stars)`), and the operation reads only what its rule needs.
 - Each operation enforces its own permissions, so a page cannot bypass a rule by forgetting to check it.
 - The database connection is passed in rather than imported, so tests run whole scenarios against a throwaway database.
-- An automated lint rule fails any code in `src/domain/` or `src/operations/` that imports Next.js, React, pages, or UI components.
+- An automated lint rule fails any code in `src/core/` that imports Next.js, React, pages, or UI components. (Originally `src/domain/` and `src/operations/`; ADR 0004 replaced those with one folder per area.)
