@@ -27,8 +27,8 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
    - One example operation with unit and integration tests.
    - Done when: a test reads as "as member A, do X; expect refusal" and passes.
 
-4. **Email sending**
-   - A mail interface with two adapters: a local inbox tool for development and Resend or Postmark for production.
+4. **Email sending** (done 2026-10-18)
+   - A mail interface with two adapters: a local inbox tool for development and Resend or Postmark for production. (Chosen: Mailpit and Resend.)
    - Done when: a test email from local development appears in the local inbox and nowhere else.
 
 5. **Accounts and the invite allowlist**
@@ -45,6 +45,7 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
 7. **First deploy**
    - Vercel, Neon Postgres, Cloudflare R2, and the email provider, with DNS for showtakes.com.
    - A preview deployment per branch.
+   - Handling a Resend outage or rate-limit failure (today `MailSendError` just fails the request; see `src/mail/`).
    - Done when: production signup works end to end on the real domain.
 
 8. **Backups**

@@ -1,4 +1,5 @@
-# Local services for development and tests, run with `pnpm db:up`
+# Local services for development and tests (Postgres and the Mailpit email
+# inbox), run with `pnpm services:up`
 # (docker compose, served by OrbStack on macOS). Production uses Neon Postgres
 # instead (ticket 7), so nothing here is deployed.
 #
@@ -9,7 +10,11 @@ name: showtakes
 
 services:
   postgres:
-    image: postgres:17-alpine
+    # Exact version, at least a week old, matching the minimumReleaseAge rule
+    # for packages in pnpm-workspace.yaml. Keep in step with the Postgres image
+    # in .github/workflows/ci.yml, and with the production major version
+    # (Neon, ticket 7). Upgrade deliberately by changing the tag.
+    image: postgres:17.11-alpine3.24
     environment:
       POSTGRES_USER: showtakes
       POSTGRES_PASSWORD: showtakes
@@ -22,6 +27,23 @@ services:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U showtakes -d showtakes"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+  # Local email inbox (ticket 4). Catches every email the app sends in
+  # development and tests, and delivers none of them. Read them at
+  # http://localhost:8025. The app sends through its HTTP API (see
+  # src/mail/mailpit-mailer.ts), and integration tests use the same API to
+  # check what arrived.
+  mailpit:
+    # Exact version, at least a week old, matching the minimumReleaseAge rule
+    # for packages in pnpm-workspace.yaml.
+    image: axllent/mailpit:v1.31.4
+    ports:
+      - "8025:8025"
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
       interval: 2s
       timeout: 5s
       retries: 15

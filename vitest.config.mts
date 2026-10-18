@@ -5,7 +5,7 @@
  * - unit: `*.test.ts`, pure code, no database. `pnpm test:unit` runs only
  *   these, so they work without Docker.
  * - integration: `*.integration.test.ts`, run against a throwaway Postgres
- *   database created by src/db/testing/global-setup.ts. Needs `pnpm db:up`.
+ *   database created by src/db/testing/global-setup.ts. Needs `pnpm services:up`.
  *
  * Browser tests are separate (Playwright, in `e2e/`) and excluded here.
  */

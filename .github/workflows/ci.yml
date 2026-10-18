@@ -11,11 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
-    # Postgres for integration tests, matching compose.yaml (same image and
-    # host port), so DATABASE_URL is identical to .env.example.
+    # Postgres and Mailpit for integration tests, matching compose.yaml (same
+    # pinned images and host ports), so the settings below match .env.example.
+    # Change image versions in both files together.
     services:
       postgres:
-        image: postgres:17-alpine
+        image: postgres:17.11-alpine3.24
         env:
           POSTGRES_USER: showtakes
           POSTGRES_PASSWORD: showtakes
@@ -27,8 +28,16 @@ jobs:
           --health-interval 2s
           --health-timeout 5s
           --health-retries 15
+      mailpit:
+        image: axllent/mailpit:v1.31.4
+        ports:
+          - 8025:8025
+    # Same settings as .env.example.
     env:
       DATABASE_URL: postgres://showtakes:showtakes@localhost:5433/showtakes
+      MAIL_PROVIDER: mailpit
+      MAIL_FROM: noreply@showtakes.test
+      MAILPIT_URL: http://localhost:8025
 
     steps:
       - uses: actions/checkout@v7
@@ -53,7 +62,8 @@ jobs:
       - run: pnpm db:migrate
 
       # Unit and integration tests; integration tests create their own
-      # throwaway database on the Postgres service above.
+      # throwaway database on the Postgres service above, and check sent
+      # mail in the Mailpit service.
       - run: pnpm test
 
       # Browser tests run against the production build.

@@ -124,7 +124,7 @@ async function withServerClient<T>(
   } catch (error) {
     throw new Error(
       `Cannot reach Postgres at ${redactPassword(serverUrl)}. ` +
-        "Start it with `pnpm db:up` (needs OrbStack running).",
+        "Start it with `pnpm services:up` (needs OrbStack running).",
       { cause: error },
     );
   }
