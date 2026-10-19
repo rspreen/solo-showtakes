@@ -1,6 +1,7 @@
 # Tasks
 
 Ordered work list for Showtakes. Reorder freely; work is taken from the top of **Now**.
+Elsewhere, refer to a ticket by its name, not its number, since numbers change when tickets move.
 Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions are in [adr/](./adr/).
 
 ## Now: MVP (invite-only)

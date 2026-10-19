@@ -1,7 +1,7 @@
 /**
- * Ticket 5's done-when, in a real browser: an invited email can sign up,
- * verify, log out, reset the password, and log back in; an email not on
- * the invite list is refused.
+ * The "Accounts and the invite allowlist" ticket's done-when, in a real
+ * browser: an invited email can sign up, verify, log out, reset the password,
+ * and log back in; an email not on the invite list is refused.
  *
  * Emails are read from the local Mailpit inbox. Test data goes into the
  * browser-test database (e2e/support/e2e-database.ts) and is removed after.

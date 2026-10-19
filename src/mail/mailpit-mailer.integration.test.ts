@@ -1,8 +1,8 @@
 /**
- * Integration test for ticket 4's done-when: an email sent with the local
- * development settings (`.env`, copied from `.env.example`) arrives in the
- * local Mailpit inbox. Mailpit never relays mail onward, so arriving there
- * means it went nowhere else. Needs `pnpm services:up`.
+ * Integration test for the "Email sending" ticket's done-when: an email sent
+ * with the local development settings (`.env`, copied from `.env.example`)
+ * arrives in the local Mailpit inbox. Mailpit never relays mail onward, so
+ * arriving there means it went nowhere else. Needs `pnpm services:up`.
  */
 // Load .env first: this test checks the local development settings.
 import "dotenv/config";

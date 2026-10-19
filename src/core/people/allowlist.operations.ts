@@ -3,8 +3,9 @@
  * is invite-only.
  *
  * Reached through `createOperations()` in `src/core/operations.ts`, as
- * `operations.allowlist`. The admin allowlist screen (ticket 13) calls these;
- * signup (ticket 5) will check the allowlist through an operation here too.
+ * `operations.allowlist`. The admin allowlist screen (the "Admin: members and
+ * allowlist" ticket) calls these; signup checks the allowlist through
+ * `isEmailOnAllowlist` here too.
  *
  * This is also the reference example of an operation (ADR 0002, ADR 0004):
  * Actor first, permission check first, expected failures returned as a

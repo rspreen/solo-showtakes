@@ -1,5 +1,6 @@
 # Continuous integration: runs every check on each push and pull request.
-# A red run here means the change must not be deployed (docs/TASKS.md, ticket 1).
+# A red run here means the change must not be deployed (docs/TASKS.md,
+# "Project skeleton").
 name: CI
 
 on:

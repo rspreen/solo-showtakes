@@ -1,6 +1,7 @@
 /**
  * Browser test: the home page loads and shows the site name.
- * Exists mainly to prove the end-to-end test setup works (ticket 1).
+ * Exists mainly to prove the end-to-end test setup works (the "Project
+ * skeleton" ticket).
  */
 import { expect, test } from "@playwright/test";
 

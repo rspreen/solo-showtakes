@@ -11,4 +11,4 @@ Signup is not an exception, because it carries our rules: the invite allowlist, 
 - Signup never reveals whether an email already has an account: it behaves as for a new one and emails the existing owner instead. The same holds for password reset requests.
 - Sessions last 90 days from last use; a password reset logs out every other browser.
 - `src/wiring/create-services.ts` is the one place the database, Mailer, Better Auth, and operations are built and connected, for both the web app (`src/server/services.ts`) and integration tests, so tests exercise the real wiring.
-- Roles (ticket 7) are not yet part of the Actor built from the session (`src/server/actor.ts`).
+- Roles (the "Roles and the first Admin" ticket) are not yet part of the Actor built from the session (`src/server/actor.ts`).

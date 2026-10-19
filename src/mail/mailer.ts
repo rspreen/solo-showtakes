@@ -7,9 +7,9 @@
  *   Mailpit inbox (compose.yaml) and is never delivered to anyone.
  * - `resend-mailer.ts`: production, through Resend.
  * `create-mailer.ts` picks one from the environment. Code that sends email
- * (signup verification and password reset, ticket 5) receives a Mailer as a
- * dependency and never knows which adapter it has, so tests can check sent
- * mail without a real provider.
+ * (signup verification and password reset, from the "Accounts and the invite
+ * allowlist" ticket) receives a Mailer as a dependency and never knows which
+ * adapter it has, so tests can check sent mail without a real provider.
  */
 
 /** Who an email is from: a display name and an address. */

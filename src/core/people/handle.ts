@@ -1,15 +1,15 @@
 /**
  * Handle rules: the format of a Member's public @handle.
  *
- * Pure functions, used by signup (`accounts.operations.ts`) now and by
- * profile editing (ticket 12) later. Uniqueness is not checked here: it
+ * Pure functions, used by signup (`accounts.operations.ts`) now and by profile
+ * editing (the "Profile" ticket) later. Uniqueness is not checked here: it
  * needs the database, so the operation and a unique index handle it.
  *
- * The rules (docs/TASKS.md, ticket 5): 2 to 30 characters; only letters,
- * numbers, periods, and underscores; starting with a letter or number; no
- * two periods in a row; stored lowercased. "Letters" means a to z: handles
- * appear in URLs, and lookalike characters from other alphabets would let
- * one handle impersonate another.
+ * The rules (docs/TASKS.md, "Accounts and the invite allowlist"): 2 to 30
+ * characters; only letters, numbers, periods, and underscores; starting with a
+ * letter or number; no two periods in a row; stored lowercased. "Letters" means
+ * a to z: handles appear in URLs, and lookalike characters from other alphabets
+ * would let one handle impersonate another.
  */
 import { type Result, failure, ok } from "../shared/result";
 

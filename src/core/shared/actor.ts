@@ -2,10 +2,11 @@
  * The Actor: who is performing an operation.
  *
  * Every operation in `src/core/` takes an Actor as its first argument
- * (ADR 0002). Pages build it once per request from the login session
- * (ticket 5): a Visitor when nobody is logged in, otherwise the Member's id
- * and roles. It deliberately carries only what permission checks need, not
- * a fully loaded Member; operations read anything else they need themselves.
+ * (ADR 0002). Pages build it once per request from the login session (the
+ * "Accounts and the invite allowlist" ticket): a Visitor when nobody is logged
+ * in, otherwise the Member's id and roles. It deliberately carries only what
+ * permission checks need, not a fully loaded Member; operations read anything
+ * else they need themselves.
  */
 
 /** A role a Member can hold. A Member may hold both, either, or neither. */

@@ -1,5 +1,6 @@
 /**
- * Unit tests for the handle format rules (ticket 5).
+ * Unit tests for the handle format rules (the "Accounts and the invite
+ * allowlist" ticket).
  */
 import { describe, expect, it } from "vitest";
 import { parseHandle } from "./handle";

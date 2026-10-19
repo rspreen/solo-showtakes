@@ -120,9 +120,9 @@ browser (`src/auth/client.ts`); signup goes through
 rules first (ADR 0005).
 
 To try it locally: add your email to the allowlist (for now,
-`pnpm db:studio` or SQL; the admin screen is ticket 13), sign up at
-http://localhost:3000/signup, and open the verification email in Mailpit at
-http://localhost:8025.
+`pnpm db:studio` or SQL; the admin screen comes with the "Admin: members and
+allowlist" ticket), sign up at http://localhost:3000/signup, and open the
+verification email in Mailpit at http://localhost:8025.
 
 ### Generated shadcn/ui code
 

@@ -1,10 +1,10 @@
 /**
  * The emails sent by the login system: what each one says.
  *
- * Better Auth (auth.ts) decides when to send them and supplies the links;
- * these functions only build the message, which auth.ts hands to the
- * Mailer (src/mail/). Plain text plus a simple HTML version; designed
- * templates can come with the site's visual design (ticket 14).
+ * Better Auth (auth.ts) decides when to send them and supplies the links; these
+ * functions only build the message, which auth.ts hands to the Mailer
+ * (src/mail/). Plain text plus a simple HTML version; designed templates can
+ * come with the site's visual design (the "UI prototypes" ticket).
  */
 import { type MailMessage } from "@/mail/mailer";
 

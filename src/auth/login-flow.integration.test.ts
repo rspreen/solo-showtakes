@@ -1,6 +1,7 @@
 /**
- * Ticket 5's done-when, below the browser: an invited email signs up,
- * verifies, logs out, resets the password, and logs back in.
+ * The "Accounts and the invite allowlist" ticket's done-when, below the
+ * browser: an invited email signs up, verifies, logs out, resets the password,
+ * and logs back in.
  *
  * Signup goes through the signup operation, as the signup page does. Every
  * other step sends real HTTP requests to Better Auth's endpoints (the same

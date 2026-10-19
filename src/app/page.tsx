@@ -1,10 +1,11 @@
 /**
  * Home page, served at `/`.
  *
- * Placeholder (ticket 1 in docs/TASKS.md): the real home page is designed in
- * the UI prototype session (ticket 14) and built in ticket 27. For now it
- * shows who is logged in, with log in / sign up links or a log out button,
- * so the account flow (ticket 5) can be tried by hand.
+ * Placeholder (the "Project skeleton" ticket in docs/TASKS.md): the real home
+ * page is designed in the UI prototype session ("UI prototypes") and built in
+ * "Logged-in home page". For now it shows who is logged in, with log in / sign
+ * up links or a log out button, so the account flow ("Accounts and the invite
+ * allowlist") can be tried by hand.
  *
  * Email-verification links land here (auth.ts sends new Members to `/`).
  * If the link had expired, Better Auth adds `?error=...`, explained below.
