@@ -5,10 +5,12 @@
  * Built on the generated shadcn/ui Input and Label (src/shadcn/). The hint
  * and error are linked to the input with `aria-describedby`, so screen
  * readers announce them, and an error marks the input `aria-invalid`, which
- * the shadcn styles show in red.
+ * the shadcn styles show in red. Password fields get a show/hide button
+ * (password-input.tsx).
  */
 import { Input } from "@/shadcn/components/ui/input";
 import { Label } from "@/shadcn/components/ui/label";
+import { PasswordInput } from "./password-input";
 
 export interface FormFieldProps {
   label: string;
@@ -38,21 +40,24 @@ export function FormField({
 }: FormFieldProps) {
   const describedById = `${name}-description`;
   const description = error ?? hint;
+  const sharedInputProps = {
+    defaultValue,
+    id: name,
+    name,
+    "aria-invalid": error ? true : undefined,
+    "aria-describedby": description ? describedById : undefined,
+    ...inputProps,
+  };
   return (
     <div className="flex flex-col gap-1.5">
       <Label htmlFor={name}>{label}</Label>
       {/* A new `key` gives a fresh input when the default changes (a form
           refilled after an error), since Base UI inputs read it only once. */}
-      <Input
-        key={defaultValue ?? ""}
-        defaultValue={defaultValue}
-        id={name}
-        name={name}
-        type={type}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={description ? describedById : undefined}
-        {...inputProps}
-      />
+      {type === "password" ? (
+        <PasswordInput key={defaultValue ?? ""} {...sharedInputProps} />
+      ) : (
+        <Input key={defaultValue ?? ""} type={type} {...sharedInputProps} />
+      )}
       {description && (
         <p
           id={describedById}

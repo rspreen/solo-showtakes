@@ -42,7 +42,14 @@ test("an invited email can sign up, verify, log out, reset the password, and log
   await page.goto("/signup");
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Handle").fill(handle);
-  await page.getByLabel("Password").fill(firstPassword);
+  await page.getByLabel("Password", { exact: true }).fill(firstPassword);
+
+  // The show/hide button reveals the password and hides it again.
+  const passwordInput = page.getByLabel("Password", { exact: true });
+  await page.getByRole("button", { name: "Show password" }).click();
+  await expect(passwordInput).toHaveAttribute("type", "text");
+  await page.getByRole("button", { name: "Hide password" }).click();
+  await expect(passwordInput).toHaveAttribute("type", "password");
 
   await page.getByRole("button", { name: "Sign up" }).click();
   await expect(page.getByRole("heading", { name: "Check your email" })).toBeVisible();
@@ -63,17 +70,17 @@ test("an invited email can sign up, verify, log out, reset the password, and log
   await page.goto(
     firstLinkIn(await textOfEmailTo(email, "Reset your Showtakes password")),
   );
-  await page.getByLabel("New password").fill(secondPassword);
+  await page.getByLabel("New password", { exact: true }).fill(secondPassword);
   await page.getByRole("button", { name: "Set new password" }).click();
   await expect(page.getByText("Your password has been changed")).toBeVisible();
 
   // Log back in, which the old password no longer does.
   await page.goto("/login");
   await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Password").fill(firstPassword);
+  await page.getByLabel("Password", { exact: true }).fill(firstPassword);
   await page.getByRole("button", { name: "Log in" }).click();
   await expect(page.getByText("do not match an account")).toBeVisible();
-  await page.getByLabel("Password").fill(secondPassword);
+  await page.getByLabel("Password", { exact: true }).fill(secondPassword);
   await page.getByRole("button", { name: "Log in" }).click();
   await expect(page.getByText(`Logged in as @${handle}`)).toBeVisible();
 });
@@ -85,7 +92,7 @@ test("an email not on the invite list is refused, keeping what was typed", async
   await page.goto("/signup");
   await page.getByLabel("Email").fill(uninvitedEmail);
   await page.getByLabel("Handle").fill(`uninvited_${runId}`);
-  await page.getByLabel("Password").fill(firstPassword);
+  await page.getByLabel("Password", { exact: true }).fill(firstPassword);
   await page.getByRole("button", { name: "Sign up" }).click();
 
   // Filtered by text: Next.js adds an empty route-announcer alert of its own.
