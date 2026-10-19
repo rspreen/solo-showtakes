@@ -13,6 +13,10 @@ import { FormField } from "@/components/form-field";
 import { FormMessage } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
 import { type SignUpFailure } from "@/core/people/accounts.operations";
+import {
+  maximumPasswordLength,
+  minimumPasswordLength,
+} from "@/core/people/password";
 import { type SignUpFormState, signUpAction } from "./actions";
 
 type Field = "email" | "password" | "handle" | "form";
@@ -81,9 +85,10 @@ export function SignUpForm() {
         type="password"
         autoComplete="new-password"
         required
-        minLength={12}
-        maxLength={128}
-        hint="At least 12 characters."
+        minLength={minimumPasswordLength}
+        maxLength={maximumPasswordLength}
+        hint={`At least ${minimumPasswordLength} characters.`}
+        showWhenPasswordAcceptable
         error={errorFor("password")}
       />
       <FormMessage>{errorFor("form")}</FormMessage>

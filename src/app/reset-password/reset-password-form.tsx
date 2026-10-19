@@ -10,6 +10,10 @@ import { authClient } from "@/auth/client";
 import { FormField } from "@/components/form-field";
 import { FormMessage } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
+import {
+  maximumPasswordLength,
+  minimumPasswordLength,
+} from "@/core/people/password";
 
 type ResetState = "editing" | "done" | "link-expired" | "too-short" | "failed";
 
@@ -50,10 +54,15 @@ export function ResetPasswordForm({ token }: { token: string }) {
         type="password"
         autoComplete="new-password"
         required
-        minLength={12}
-        maxLength={128}
-        hint="At least 12 characters."
-        error={state === "too-short" ? "Use at least 12 characters." : undefined}
+        minLength={minimumPasswordLength}
+        maxLength={maximumPasswordLength}
+        hint={`At least ${minimumPasswordLength} characters.`}
+        showWhenPasswordAcceptable
+        error={
+          state === "too-short"
+            ? `Use at least ${minimumPasswordLength} characters.`
+            : undefined
+        }
       />
       <FormMessage>
         {state === "failed" && "Something went wrong. Please try again in a moment."}

@@ -169,7 +169,7 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
 
 Minor improvements, picked up whenever convenient.
 
-- Signup password field: show a standard "acceptable" indicator, such as a check mark, once the typed password meets the rules (12 to 128 characters, from `src/core/people/password.ts`), so people know they can stop editing it. Also on the reset page's new-password field.
+- (done 2026-10-19) Signup password field: show a standard "acceptable" indicator, such as a check mark, once the typed password meets the rules (12 to 128 characters, from `src/core/people/password.ts`), so people know they can stop editing it. Also on the reset page's new-password field.
 
 ## Next: after the MVP
 

@@ -45,7 +45,13 @@ test("an invited email can sign up, verify, log out, reset the password, and log
   await page.goto("/signup");
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Handle").fill(handle);
+  // The field confirms when the password meets the rules (12 or more
+  // characters): not while it is too short, then once it is long enough.
+  const passwordStatus = page.getByRole("status").filter({ hasText: /./ });
+  await page.getByLabel("Password", { exact: true }).fill("too short");
+  await expect(passwordStatus).toHaveCount(0);
   await page.getByLabel("Password", { exact: true }).fill(firstPassword);
+  await expect(passwordStatus).toHaveText("Password meets the rules.");
 
   // The show/hide button reveals the password and hides it again.
   const passwordInput = page.getByLabel("Password", { exact: true });

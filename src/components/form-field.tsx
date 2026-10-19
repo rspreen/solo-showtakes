@@ -5,7 +5,8 @@
  * Built on the generated shadcn/ui Input and Label (src/shadcn/). The hint
  * and error are linked to the input with `aria-describedby`, so screen
  * readers announce them, and an error marks the input `aria-invalid`, which
- * the shadcn styles show in red. Password fields get a show/hide button
+ * the shadcn styles show in red. Password fields get a show/hide button,
+ * and optionally a check mark once the password meets the rules
  * (password-input.tsx).
  */
 import { Input } from "@/shadcn/components/ui/input";
@@ -26,6 +27,11 @@ export interface FormFieldProps {
   hint?: string;
   /** What is wrong with the value, shown instead of the hint. */
   error?: string;
+  /**
+   * For a new password (signup, reset): show a check mark once the typed
+   * password meets the rules. Ignored for other types.
+   */
+  showWhenPasswordAcceptable?: boolean;
 }
 
 /** Renders a label, an input, and its hint or error. */
@@ -36,6 +42,7 @@ export function FormField({
   hint,
   error,
   defaultValue,
+  showWhenPasswordAcceptable,
   ...inputProps
 }: FormFieldProps) {
   const describedById = `${name}-description`;
@@ -54,7 +61,11 @@ export function FormField({
       {/* A new `key` gives a fresh input when the default changes (a form
           refilled after an error), since Base UI inputs read it only once. */}
       {type === "password" ? (
-        <PasswordInput key={defaultValue ?? ""} {...sharedInputProps} />
+        <PasswordInput
+          key={defaultValue ?? ""}
+          showWhenAcceptable={showWhenPasswordAcceptable}
+          {...sharedInputProps}
+        />
       ) : (
         <Input key={defaultValue ?? ""} type={type} {...sharedInputProps} />
       )}
