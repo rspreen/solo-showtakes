@@ -1,12 +1,14 @@
 /**
  * ESLint configuration: automated code checks run by `pnpm lint` and in CI.
  *
- * Starts from Next.js's recommended rule sets, then adds two project rules
- * for `src/core/` (the business rules and operations; ADR 0002, ADR 0004):
+ * Starts from Next.js's recommended rule sets, then adds project rules.
+ * For `src/core/` (the business rules and operations; ADR 0002, ADR 0004):
  * - No file there may depend on the web framework or the UI.
  * - Only files whose name marks them as database code may touch the
  *   database; everything else in `src/core/` stays pure, so it can be unit
  *   tested without one.
+ * For the website's own code: it may not import the operator Actor, which
+ * only scripts may act as (ADR 0007).
  */
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
@@ -53,6 +55,23 @@ const databaseFilesInCore = [
   "src/core/**/*.integration.test.ts",
 ];
 
+// Web code: pages, components, server helpers, Better Auth, and Next.js's
+// instrumentation. None of it may act as the operator.
+const webCodeFiles = [
+  "src/app/**/*.{ts,tsx}",
+  "src/components/**/*.{ts,tsx}",
+  "src/server/**/*.{ts,tsx}",
+  "src/auth/**/*.{ts,tsx}",
+  "src/instrumentation.ts",
+];
+const operatorImportPatterns = [
+  {
+    group: ["@/core/shared/operator", "**/shared/operator"],
+    message:
+      "Web code must not act as the operator; only scripts may (see ADR 0007).",
+  },
+];
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -74,6 +93,14 @@ const eslintConfig = defineConfig([
         "error",
         { patterns: [...frameworkImportPatterns, ...databaseImportPatterns] },
       ],
+    },
+  },
+  // Web code: no operator. (These files have no other import rules, so
+  // this config does not replace one.)
+  {
+    files: webCodeFiles,
+    rules: {
+      "no-restricted-imports": ["error", { patterns: operatorImportPatterns }],
     },
   },
   // Override default ignores of eslint-config-next.

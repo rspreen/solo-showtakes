@@ -4,17 +4,16 @@
  *
  * Route handlers and src/server/ call `getServices()`; pages and server
  * actions reach operations through `getOperations()` (./operations.ts),
- * which adds the request's details to the Logger. The actual construction
- * is in src/wiring/create-services.ts, shared with the tests; this file
- * only reads the settings and keeps one copy.
+ * which adds the request's details to the Logger. The construction is in
+ * src/wiring/ (shared with scripts and tests); this file only keeps one
+ * copy per process.
  *
  * `import "server-only"` makes the build fail if browser code ever imports
  * this file, which would otherwise risk leaking secrets into the page.
  */
 import "server-only";
-import { createLoggerFromEnvironment } from "@/logging/create-logger";
-import { createMailerFromEnvironment } from "@/mail/create-mailer";
-import { type Services, createServices } from "@/wiring/create-services";
+import { type Services } from "@/wiring/create-services";
+import { createServicesFromEnvironment } from "@/wiring/create-services-from-environment";
 
 // Kept on globalThis rather than in a module variable because the dev
 // server reloads modules on every edit, which would otherwise open a new
@@ -25,23 +24,6 @@ const globalCache = globalThis as typeof globalThis & {
 
 /** Returns the process's services, building them on first use. */
 export function getServices(): Services {
-  globalCache.showtakesServices ??= createServices({
-    databaseUrl: requireSetting("DATABASE_URL"),
-    mailer: createMailerFromEnvironment(),
-    logger: createLoggerFromEnvironment(),
-    baseUrl: requireSetting("BETTER_AUTH_URL"),
-    authSecret: requireSetting("BETTER_AUTH_SECRET"),
-  });
+  globalCache.showtakesServices ??= createServicesFromEnvironment();
   return globalCache.showtakesServices;
-}
-
-/** Returns an environment setting, or throws if it is missing. */
-function requireSetting(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(
-      `${name} is not set. Locally, copy it from .env.example into .env.`,
-    );
-  }
-  return value;
 }

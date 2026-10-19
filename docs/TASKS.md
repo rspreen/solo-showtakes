@@ -46,7 +46,7 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
    - Operations receive a logger built for the request, carrying its IP address (from the header the host sets) and request id.
    - Done when: a failed login and a non-invited signup each write a warn line with the email and IP address to the log file, and a test shows a password never appears in the output.
 
-7. **Roles and the first Admin**
+7. **Roles and the first Admin** (ADR 0007; done 2026-10-19)
    - Curator and Admin roles on Member.
    - A script that promotes a Member to Admin by email.
    - Done when: the script works locally, and role checks are enforced in the operations layer.
@@ -164,6 +164,12 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
 
 27. **Logged-in home page**
     - Sign out, plus whatever the chosen prototype shows for a logged-in Member.
+
+### Small items
+
+Minor improvements, picked up whenever convenient.
+
+- Signup password field: show a standard "acceptable" indicator, such as a check mark, once the typed password meets the rules (12 to 128 characters, from `src/core/people/password.ts`), so people know they can stop editing it. Also on the reset page's new-password field.
 
 ## Next: after the MVP
 

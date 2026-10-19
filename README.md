@@ -40,6 +40,7 @@ pnpm dev                                # http://localhost:3000
 | `pnpm db:generate`   | Write a SQL migration from changes to any `schema.ts`    |
 | `pnpm db:migrate`    | Apply pending migrations to `DATABASE_URL`               |
 | `pnpm db:studio`     | Browse the database in Drizzle Studio                    |
+| `pnpm admin:promote` | Make a signed-up Member an Admin: `... you@example.com`  |
 
 ### Database tests
 
@@ -73,6 +74,7 @@ which they create and migrate themselves, and read emails from Mailpit.
 | `src/auth/`       | Better Auth setup: logins, sessions, verification, reset       |
 | `src/wiring/`     | Builds and connects the services; shared by app and tests      |
 | `src/server/`     | Server-only helpers: services, operations, the current Actor   |
+| `scripts/`        | Command-line scripts, acting as the operator (ADR 0007)        |
 | `e2e/`            | Browser tests                                                  |
 
 ### Business rules and operations
@@ -146,6 +148,18 @@ To try it locally: add your email to the allowlist (for now,
 `pnpm db:studio` or SQL; the admin screen comes with the "Admin: members and
 allowlist" ticket), sign up at http://localhost:3000/signup, and open the
 verification email in Mailpit at http://localhost:8025.
+
+### Roles and scripts
+
+A Member may be a Curator, an Admin, both, or neither (CONTEXT.md). Roles
+are rows in the `member_role` table, read into the Actor on every request,
+so a change takes effect on the Member's next page. To make yourself the
+first Admin, sign up, then run `pnpm admin:promote you@example.com`.
+
+Scripts in `scripts/` run with `tsx` and act as the operator (ADR 0007):
+they call the same operations as the site, which let the operator through
+wherever an Admin may act. Web code can never act as the operator; lint and
+the permission checks both refuse it.
 
 ### Generated shadcn/ui code
 

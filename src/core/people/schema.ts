@@ -1,6 +1,6 @@
 /**
- * Database tables for the People area: Members, roles, the allowlist, and
- * later Follow.
+ * Database tables for the People area: Members, their roles, the
+ * allowlist, and later Follow.
  *
  * Each area of `src/core/` keeps its tables in its own `schema.ts`, and
  * `src/db/schema.ts` gathers them all. Drizzle uses them in two ways:
@@ -18,10 +18,14 @@ import {
   bigint,
   boolean,
   index,
+  pgEnum,
   pgTable,
+  primaryKey,
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
+// Relative, not `@/`: drizzle-kit loads this file and does not know the alias.
+import { roles } from "../shared/actor";
 
 /**
  * Columns shared by most tables. Each call builds fresh column objects, as
@@ -80,6 +84,28 @@ export const member = pgTable("member", {
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 });
+
+/** The database type for a role: one of the names in `roles` (actor.ts). */
+export const roleName = pgEnum("role_name", roles);
+
+/**
+ * The roles each Member holds (CONTEXT.md: Curator, Admin): one row per
+ * role held, so a Member with none has no rows. Granting a role inserts a
+ * row and revoking deletes it (roles.operations.ts). The Member's id and
+ * the role together are the key (ADR 0003), so a role cannot be held twice.
+ */
+export const memberRole = pgTable(
+  "member_role",
+  {
+    memberId: bigint("member_id", { mode: "number" })
+      .notNull()
+      .references(() => member.id, { onDelete: "cascade" }),
+    role: roleName("role").notNull(),
+    /** When the role was granted. */
+    createdAt: createdAt(),
+  },
+  (table) => [primaryKey({ columns: [table.memberId, table.role] })],
+);
 
 /** Better Auth: one logged-in browser. Deleted on logout or expiry. */
 export const session = pgTable(

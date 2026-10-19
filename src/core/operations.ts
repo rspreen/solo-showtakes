@@ -20,6 +20,7 @@ import {
   createAccountOperations,
 } from "./people/accounts.operations";
 import { createAllowlistOperations } from "./people/allowlist.operations";
+import { createRoleOperations } from "./people/roles.operations";
 
 /**
  * What the operations layer needs from its caller. Built in
@@ -42,6 +43,7 @@ export function createOperations({
   return {
     accounts: createAccountOperations({ db, accountCreator, logger }),
     allowlist: createAllowlistOperations({ db, logger }),
+    roles: createRoleOperations({ db, logger }),
   };
 }
 

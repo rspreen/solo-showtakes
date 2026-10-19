@@ -60,6 +60,10 @@ _Avoid_: Producer, editor
 A Member authorised to manage Members, roles, and any catalog entry, and to take down Reviews and Comments. A Member may be a Curator, an Admin, both, or neither.
 _Avoid_: Moderator, superuser, staff
 
+**Operator**:
+Whoever runs a script from a terminal on a machine with database access, such as to make the first Admin or import Cities. Not a Member and never acts through the site; it may do anything an Admin may, but nothing that needs a Member's own identity.
+_Avoid_: System, root, service account
+
 **Owner**:
 The single Curator responsible for a Production's catalog entry and the only Member, apart from an Admin, who may edit it. The Curator who creates a Production is its first Owner.
 _Avoid_: Editor, maintainer

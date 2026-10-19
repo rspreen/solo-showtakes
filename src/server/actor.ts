@@ -6,13 +6,18 @@
  * through Better Auth, which checks it against the session table, so a
  * forged or expired cookie gives a Visitor.
  *
+ * The Actor's roles are read from the database on every request
+ * (`memberActorFor`), not stored in the session, so granting or revoking a
+ * role takes effect on the Member's next page.
+ *
  * React's `cache` makes repeated calls within one request share a single
  * lookup.
  */
 import "server-only";
 import { headers } from "next/headers";
 import { cache } from "react";
-import { type Actor, memberActor, visitor } from "@/core/shared/actor";
+import { memberActorFor } from "@/core/people/roles.operations";
+import { type Actor, visitor } from "@/core/shared/actor";
 import { getServices } from "./services";
 
 /** The logged-in Member's handle and display name, for showing in pages. */
@@ -40,11 +45,12 @@ export const getCurrentMember = cache(async (): Promise<CurrentMember | null> =>
   };
 });
 
-/** Returns the Actor for the current request. */
-export async function getActor(): Promise<Actor> {
+/**
+ * Returns the Actor for the current request, with the Member's roles.
+ * Cached per request.
+ */
+export const getActor = cache(async (): Promise<Actor> => {
   const current = await getCurrentMember();
   if (!current) return visitor;
-  // Roles are added by the "Roles and the first Admin" ticket; until then no
-  // Member holds one.
-  return memberActor(current.memberId, []);
-}
+  return memberActorFor(getServices().db, current.memberId);
+});

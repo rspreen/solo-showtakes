@@ -12,7 +12,11 @@
 import path from "node:path";
 import { defineConfig } from "vitest/config";
 
-const integrationTestPattern = "src/**/*.integration.test.ts";
+// Integration tests live beside the code they test, including scripts.
+const integrationTestPatterns = [
+  "src/**/*.integration.test.ts",
+  "scripts/**/*.integration.test.ts",
+];
 
 export default defineConfig({
   resolve: {
@@ -30,14 +34,14 @@ export default defineConfig({
         test: {
           name: "unit",
           include: ["src/**/*.test.ts"],
-          exclude: [integrationTestPattern],
+          exclude: integrationTestPatterns,
         },
       },
       {
         extends: true,
         test: {
           name: "integration",
-          include: [integrationTestPattern],
+          include: integrationTestPatterns,
           globalSetup: ["src/db/testing/global-setup.ts"],
         },
       },

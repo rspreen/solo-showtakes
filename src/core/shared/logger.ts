@@ -30,6 +30,9 @@ export type LogEvent =
   // Allowlist (src/core/people/allowlist.operations.ts).
   | "allowlist.email.added"
   | "allowlist.email.already-listed"
+  // Roles (src/core/people/roles.operations.ts).
+  | "roles.role.granted"
+  | "roles.role.not-granted"
   // Login mechanics handled by Better Auth (src/auth/auth.ts).
   | "auth.login.succeeded"
   | "auth.login.failed"
@@ -54,12 +57,21 @@ export interface RequestLogFields {
   requestId?: string;
   /** The logged-in Member, when there is one. */
   memberId?: number;
+  /**
+   * For scripts acting as the operator (ADR 0007): the computer account
+   * that ran the script, so its actions can be traced to a person.
+   */
+  operatorName?: string;
 }
 
 /** The fields an event can carry, beyond where its request came from. */
 export interface LogFields extends RequestLogFields {
   /** Why something was refused or failed, such as "not-invited". */
   reason?: string;
+  /** The role involved, for role changes. */
+  role?: string;
+  /** The Member acted on, when different from the one acting. */
+  targetMemberId?: number;
   /**
    * The email involved, exactly as normalised, including emails that match
    * no Member or are not on the allowlist (ADR 0006).

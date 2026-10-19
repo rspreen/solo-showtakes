@@ -15,6 +15,13 @@
       "when": 1792353865127,
       "tag": "0001_create_member_and_login_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792405674977,
+      "tag": "0002_create_member_role",
+      "breakpoints": true
     }
   ]
 }

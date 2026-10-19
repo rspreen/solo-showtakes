@@ -6,7 +6,7 @@ The layer is not reachable over the network today; it is an internal boundary, n
 
 ## Shape of an operation
 
-- Every operation takes the acting party explicitly as its first argument: a Visitor, or a Member's id plus roles, built once per request from the login session. It does not take a fully loaded Member.
+- Every operation takes the acting party explicitly as its first argument: a Visitor, or a Member's id plus roles, built once per request from the login session. It does not take a fully loaded Member. (Scripts act as a third kind, the operator; see ADR 0007.)
 - The things being acted on are passed as ids (`setRating(actor, productionId, stars)`), and the operation reads only what its rule needs.
 - Each operation enforces its own permissions, so a page cannot bypass a rule by forgetting to check it.
 - The database connection is passed in rather than imported, so tests run whole scenarios against a throwaway database.

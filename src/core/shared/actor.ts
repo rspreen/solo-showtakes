@@ -7,10 +7,20 @@
  * in, otherwise the Member's id and roles. It deliberately carries only what
  * permission checks need, not a fully loaded Member; operations read anything
  * else they need themselves.
+ *
+ * Scripts run from a terminal (`scripts/`) act as the third kind, the
+ * operator (ADR 0007): whoever runs a script on a machine with database
+ * access. The operator value itself lives in `operator.ts`, which web code
+ * may not import.
  */
 
-/** A role a Member can hold. A Member may hold both, either, or neither. */
-export type Role = "curator" | "admin";
+/**
+ * The roles a Member can hold (CONTEXT.md). A Member may hold both, either,
+ * or neither. The database's role type is built from this list
+ * (src/core/people/schema.ts), so the two cannot drift apart.
+ */
+export const roles = ["curator", "admin"] as const;
+export type Role = (typeof roles)[number];
 
 /** Someone using the site without being logged in. */
 export interface VisitorActor {
@@ -24,7 +34,16 @@ export interface MemberActor {
   roles: readonly Role[];
 }
 
-export type Actor = VisitorActor | MemberActor;
+/**
+ * Whoever runs a script from a terminal (ADR 0007). Admin-only operations
+ * accept it; operations needing a Member's identity refuse it. See
+ * permissions.ts.
+ */
+export interface OperatorActor {
+  kind: "operator";
+}
+
+export type Actor = VisitorActor | MemberActor | OperatorActor;
 
 /** The Actor for anyone who is not logged in. */
 export const visitor: VisitorActor = { kind: "visitor" };
