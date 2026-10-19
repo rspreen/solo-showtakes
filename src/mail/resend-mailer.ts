@@ -4,7 +4,7 @@
  *
  * Called directly with `fetch` rather than through Resend's SDK: one
  * request does all we need, and it keeps a dependency out of the project.
- * The sending domain and API key are set up in the first deploy (ticket 7);
+ * The sending domain and API key are set up in the first deploy (ticket 8);
  * until then this adapter is covered only by unit tests with a fake network.
  */
 import {

@@ -2,7 +2,7 @@
  * Handle rules: the format of a Member's public @handle.
  *
  * Pure functions, used by signup (`accounts.operations.ts`) now and by
- * profile editing (ticket 11) later. Uniqueness is not checked here: it
+ * profile editing (ticket 12) later. Uniqueness is not checked here: it
  * needs the database, so the operation and a unique index handle it.
  *
  * The rules (docs/TASKS.md, ticket 5): 2 to 30 characters; only letters,

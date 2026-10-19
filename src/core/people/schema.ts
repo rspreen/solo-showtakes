@@ -67,12 +67,12 @@ export const member = pgTable("member", {
   id: identityId(),
   /** Public @handle; format rules in handle.ts. Stored lowercased. */
   handle: text("handle").notNull().unique(),
-  /** Shown beside the handle. Starts equal to it; editable in ticket 11. */
+  /** Shown beside the handle. Starts equal to it; editable in ticket 12. */
   displayName: text("display_name").notNull(),
   /** Login address, stored normalised (email.ts). Never shown publicly. */
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").notNull().default(false),
-  /** Better Auth's avatar field; unused until profiles (ticket 11). */
+  /** Better Auth's avatar field; unused until profiles (ticket 12). */
   image: text("image"),
   createdAt: createdAt(),
   updatedAt: updatedAt(),

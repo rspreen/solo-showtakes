@@ -37,18 +37,29 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
    - Handle is chosen at signup and must meet the format rules: 2-30 characters, letters, numbers, periods and underscores, starting with a letter or number, no consecutive periods, lowercased, unique.
    - Done when: an allowlisted email can sign up, verify, log out, reset the password, and log back in; a non-listed email is refused; handle rules are covered by unit tests.
 
-6. **Roles and the first Admin**
+6. **Logging** (ADR 0006)
+   - A Logger interface passed in like the database and Mailer, with a Pino adapter writing one JSON object per line to standard output, and also to `logs/showtakes.log` (not committed) in development. `LOG_LEVEL` sets which levels appear.
+   - Named events with fixed fields: event, reason, email, IP address, user agent, Member id, and request id. Successes are logged at info, refusals and failed logins at warn, and faults at error.
+   - Passwords, tokens, cookies, and authorization headers are always redacted.
+   - Better Auth's own messages go to the same logger. An after-hook logs login, logout, verification, and password reset outcomes, and the signup operation logs its own outcomes.
+   - Operations receive a logger built for the request, carrying its IP address (from the header the host sets) and request id.
+   - Done when: a failed login and a non-invited signup each write a warn line with the email and IP address to the log file, and a test shows a password never appears in the output.
+
+7. **Roles and the first Admin**
    - Curator and Admin roles on Member.
    - A script that promotes a Member to Admin by email.
    - Done when: the script works locally, and role checks are enforced in the operations layer.
 
-7. **First deploy**
+8. **First deploy**
    - Vercel, Neon Postgres, Cloudflare R2, and the email provider, with DNS for showtakes.com.
    - A preview deployment per branch.
    - Handling a Resend outage or rate-limit failure (today `MailSendError` just fails the request; see `src/mail/`).
+   - Rate-limit counters stored in the database (Better Auth's `database` rate-limit storage) rather than in memory, with limits on login, password reset requests, verification resends, and the signup server action (ADR 0006).
+   - New passwords checked against known breaches (Better Auth's `haveibeenpwned` plugin), and a decision on whether signup goes ahead or is refused while that service is down.
+   - A log drain sending logs to a log service (Axiom, Better Stack, or similar), with a retention period of 30 to 90 days. Check which Vercel plans include log drains.
    - Done when: production signup works end to end on the real domain.
 
-8. **Backups**
+9. **Backups**
    - Point-in-time restore enabled on the database.
    - A nightly dump copied to separate storage.
    - One rehearsed restore, written up.
@@ -56,35 +67,35 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
 
 ### Reference data and media
 
-9. **City reference list**
-   - GeoNames cities above roughly 15,000 population imported by script.
-   - A City typeahead operation.
-   - Admins can add a City.
-   - Done when: typing "new y" offers New York City.
+10. **City reference list**
+    - GeoNames cities above roughly 15,000 population imported by script.
+    - A City typeahead operation.
+    - Admins can add a City.
+    - Done when: typing "new y" offers New York City.
 
-10. **Image storage**
+11. **Image storage**
     - A storage interface backed by a local folder in development and R2 in production.
     - Uploads are size-limited and resized to a few fixed sizes.
     - Done when: an uploaded image is served at each size in both environments.
 
 ### Members
 
-11. **Profile**
+12. **Profile**
     - Edit display name (up to 30 characters, any characters), bio, avatar, City, default comment setting (anyone or just you), and handle (freely changeable).
     - Public profile page by handle.
     - Done when: a Visitor can view a Member's profile.
 
-12. **Admin: members and allowlist**
+13. **Admin: members and allowlist**
     - Admin screens to list, create (bypassing verification), edit, and delete Members; grant and revoke roles; manage the allowlist.
     - Done when: you can invite a tester and make them a Curator entirely through the interface.
 
 ### Catalog
 
-13. **UI prototypes** (separate session)
+14. **UI prototypes** (separate session)
     - Two or three throwaway looks for the home page and the Production page.
     - Done when: one direction is chosen.
 
-14. **Create and edit Productions**
+15. **Create and edit Productions**
     - A Curator creates a Production.
     - The title typeahead links to an existing Work or silently creates one (title, creators, Category).
     - Dates: start year required; start month, end year, and end month optional.
@@ -92,64 +103,64 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
     - The creator becomes the Owner, and only the Owner or an Admin can edit.
     - Done when: the permission rules are covered by operation tests.
 
-15. **Engagements and Venues**
+16. **Engagements and Venues**
     - The Owner adds Engagements: City required, Venue optional (typeahead, created inline, must be in the same City), dates optional.
     - Done when: a touring Production can list several Engagements.
 
-16. **Production page**
+17. **Production page**
     - Image, title with qualifier (producer, City, start year), description, website, and Engagements.
     - Rating summary and reviews are added by later tickets.
     - Done when: the page is viewable by Visitors.
 
-17. **Browse and search**
+18. **Browse and search**
     - Lists of recently added and recently reviewed Productions.
     - Fuzzy title search in Postgres.
     - Done when: a misspelled title still finds the Production.
 
 ### Opinions
 
-18. **Ratings**
+19. **Ratings**
     - A Member sets or clears one Rating per Production (half to five stars).
     - The Production page shows the mean to two decimals, the count, stars, and a distribution chart.
     - Ratings are public on the Member's profile.
     - Done when: the average recalculates correctly in tests.
 
-19. **Reviews**
+20. **Reviews**
     - One Review per Member per Production, up to 15,000 characters.
     - States: Draft, Published, Withdrawn.
     - An "edited" marker after publishing.
     - The Production page lists Published reviews, collapsed with "more", sorted by most liked (default) or most recent.
     - Done when: the state transitions are covered by tests.
 
-20. **Likes**
+21. **Likes**
     - Toggle a Like on another Member's Published Review; no self-likes.
     - The count is shown on the Review.
     - Done when: the rules are covered by operation tests.
 
-21. **Comments**
+22. **Comments**
     - A flat list per Review, up to 2,000 characters.
     - Per-Review setting (anyone or just you), defaulting from the profile.
     - The setting gates new Comments only.
     - The author can always comment; commenters can delete their own; the Review's author can delete any Comment on it.
     - Done when: the rules are covered by operation tests.
 
-22. **My reviews**
+23. **My reviews**
     - A Member's own list of Reviews in every state, sortable by Production, date written, or most recent Comment.
 
 ### Administration and lifecycle
 
-23. **Admin: catalog and moderation**
+24. **Admin: catalog and moderation**
     - Edit any Production, reassign its Owner, and delete it.
     - Mark a Review or Comment as Removed.
 
-24. **Deletion rules**
+25. **Deletion rules**
     - Account deletion erases the Member's Ratings, Reviews, Comments, and Likes, and their Productions become admin-owned.
     - An Owner can delete a Production only while it has no Ratings or Reviews.
 
-25. **Merge script**
+26. **Merge script**
     - Merge duplicate Works or Venues, moving everything attached to them.
 
-26. **Logged-in home page**
+27. **Logged-in home page**
     - Sign out, plus whatever the chosen prototype shows for a logged-in Member.
 
 ## Next: after the MVP
@@ -164,8 +175,10 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
 - Block (semantics settled; see CONTEXT.md)
 - Reporting Comments, and a moderation queue
 - Handle and display-name change limits, and the 14-day hold on an old handle
-- Rate limiting and spam defences
-- Terms of use, privacy policy, and an image takedown contact
+- Per-account login throttling: after about 10 failures in 15 minutes, refuse that email's logins for 15 minutes with the usual "do not match" message. A counter in the database, and no hard lockout (ADR 0006).
+- Email the Member when their password changes
+- Spam defences beyond rate limiting
+- Terms of use, privacy policy (covering the emails and IP addresses kept in logs), and an image takedown contact
 - "Message the Owner" queue
 
 ## Later: no date set

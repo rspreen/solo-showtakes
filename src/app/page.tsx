@@ -2,7 +2,7 @@
  * Home page, served at `/`.
  *
  * Placeholder (ticket 1 in docs/TASKS.md): the real home page is designed in
- * the UI prototype session (ticket 13) and built in ticket 26. For now it
+ * the UI prototype session (ticket 14) and built in ticket 27. For now it
  * shows who is logged in, with log in / sign up links or a log out button,
  * so the account flow (ticket 5) can be tried by hand.
  *

@@ -3,7 +3,7 @@
  * is invite-only.
  *
  * Reached through `createOperations()` in `src/core/operations.ts`, as
- * `operations.allowlist`. The admin allowlist screen (ticket 12) calls these;
+ * `operations.allowlist`. The admin allowlist screen (ticket 13) calls these;
  * signup (ticket 5) will check the allowlist through an operation here too.
  *
  * This is also the reference example of an operation (ADR 0002, ADR 0004):

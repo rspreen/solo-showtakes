@@ -1,7 +1,7 @@
 /**
  * The frame around the account pages (sign up, log in, password reset): a
  * centred column with a heading. Deliberately plain until the site's look is
- * chosen in the UI prototype session (ticket 13).
+ * chosen in the UI prototype session (ticket 14).
  */
 
 /** Renders a page heading, optional intro, and the page's content. */

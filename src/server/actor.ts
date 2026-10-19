@@ -44,6 +44,6 @@ export const getCurrentMember = cache(async (): Promise<CurrentMember | null> =>
 export async function getActor(): Promise<Actor> {
   const current = await getCurrentMember();
   if (!current) return visitor;
-  // Roles are added by ticket 6; until then no Member holds one.
+  // Roles are added by ticket 7; until then no Member holds one.
   return memberActor(current.memberId, []);
 }

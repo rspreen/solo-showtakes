@@ -1,7 +1,7 @@
 # Local services for development and tests (Postgres and the Mailpit email
 # inbox), run with `pnpm services:up`
 # (docker compose, served by OrbStack on macOS). Production uses Neon Postgres
-# instead (ticket 7), so nothing here is deployed.
+# instead (ticket 8), so nothing here is deployed.
 #
 # Tests do not use the `showtakes` database below: each `pnpm test` run
 # creates its own throwaway database on this same server (see
@@ -13,7 +13,7 @@ services:
     # Exact version, at least a week old, matching the minimumReleaseAge rule
     # for packages in pnpm-workspace.yaml. Keep in step with the Postgres image
     # in .github/workflows/ci.yml, and with the production major version
-    # (Neon, ticket 7). Upgrade deliberately by changing the tag.
+    # (Neon, ticket 8). Upgrade deliberately by changing the tag.
     image: postgres:17.11-alpine3.24
     environment:
       POSTGRES_USER: showtakes
