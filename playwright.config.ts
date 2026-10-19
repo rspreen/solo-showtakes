@@ -8,11 +8,14 @@
  *
  * The server uses its own database, `showtakes_e2e` (e2e/support/), prepared
  * by e2e/global-setup.ts, and sends mail to the local Mailpit inbox. Links
- * in those emails point at this port, so the tests can follow them.
+ * in those emails point at this port, so the tests can follow them. It logs
+ * to logs/e2e.log (e2e/support/e2e-log.ts), which tests read to check what
+ * was logged.
  */
 import "dotenv/config";
 import { defineConfig, devices } from "@playwright/test";
 import { e2eDatabaseUrl } from "./e2e/support/e2e-database";
+import { e2eLogFile } from "./e2e/support/e2e-log";
 
 const port = 3100;
 const baseURL = `http://localhost:${port}`;
@@ -39,6 +42,8 @@ export default defineConfig({
       DATABASE_URL: e2eDatabaseUrl(),
       BETTER_AUTH_URL: baseURL,
       MAIL_PROVIDER: "mailpit",
+      LOG_LEVEL: "info",
+      LOG_FILE: e2eLogFile,
     },
   },
 });

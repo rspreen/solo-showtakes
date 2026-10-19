@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# logs (LOG_FILE in .env; see src/logging/create-logger.ts)
+/logs/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

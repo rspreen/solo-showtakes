@@ -1,7 +1,9 @@
 /**
  * The "Accounts and the invite allowlist" ticket's done-when, in a real
  * browser: an invited email can sign up, verify, log out, reset the password,
- * and log back in; an email not on the invite list is refused.
+ * and log back in; an email not on the invite list is refused. Also the
+ * "Logging" ticket's done-when: a failed login and a refused signup each
+ * write a warn line with the email and IP address to the log file.
  *
  * Emails are read from the local Mailpit inbox. Test data goes into the
  * browser-test database (e2e/support/e2e-database.ts) and is removed after.
@@ -14,6 +16,7 @@ import {
   textOfEmailTo,
 } from "../src/mail/testing/mailpit-inbox";
 import { withE2eDatabase } from "./support/e2e-database";
+import { e2eLogLines } from "./support/e2e-log";
 
 const runId = randomUUID().slice(0, 8);
 const email = `browser-${runId}@example.com`;
@@ -80,6 +83,13 @@ test("an invited email can sign up, verify, log out, reset the password, and log
   await page.getByLabel("Password", { exact: true }).fill(firstPassword);
   await page.getByRole("button", { name: "Log in" }).click();
   await expect(page.getByText("do not match an account")).toBeVisible();
+  expect(e2eLogLines("auth.login.failed", email)).toContainEqual(
+    expect.objectContaining({
+      level: "warn",
+      reason: "INVALID_EMAIL_OR_PASSWORD",
+      ip: expect.any(String),
+    }),
+  );
   await page.getByLabel("Password", { exact: true }).fill(secondPassword);
   await page.getByRole("button", { name: "Log in" }).click();
   await expect(page.getByText(`Logged in as @${handle}`)).toBeVisible();
@@ -101,4 +111,14 @@ test("an email not on the invite list is refused, keeping what was typed", async
   ).toBeVisible();
   await expect(page.getByLabel("Email")).toHaveValue(uninvitedEmail);
   await expect(page.getByLabel("Handle")).toHaveValue(`uninvited_${runId}`);
+
+  // The refusal is in the log file, with where the request came from.
+  expect(e2eLogLines("accounts.signup.refused", uninvitedEmail)).toEqual([
+    expect.objectContaining({
+      level: "warn",
+      reason: "not-invited",
+      ip: expect.any(String),
+      requestId: expect.any(String),
+    }),
+  ]);
 });

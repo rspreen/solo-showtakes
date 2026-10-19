@@ -7,6 +7,10 @@
  * other step sends real HTTP requests to Better Auth's endpoints (the same
  * ones the login pages call from the browser), with links read from the
  * emails in Mailpit. The browser version of this is e2e/accounts.spec.ts.
+ *
+ * The services log through a real Pino logger into memory, so the test also
+ * checks the actual log lines: each step's event, with the email and IP
+ * address, and that neither password ever appears (ADR 0006).
  */
 import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
@@ -18,18 +22,30 @@ import {
   firstLinkIn,
   textOfEmailTo,
 } from "@/mail/testing/mailpit-inbox";
+import { createPinoLogger } from "@/logging/pino-logger";
+import { createCapturedOutput } from "@/logging/testing/captured-output";
 import {
-  createTestServices,
+  createTestServicesWithLogger,
   testBaseUrl,
 } from "@/wiring/testing/test-services";
 
-const services = createTestServices();
+const logOutput = createCapturedOutput();
+const services = createTestServicesWithLogger(
+  createPinoLogger({ level: "info", outputs: [logOutput.stream] }),
+);
 const { auth, db, operations } = services;
 
 const email = `flow-${randomUUID().slice(0, 8)}@example.com`;
 const handle = `flow_${randomUUID().slice(0, 8)}`;
 const firstPassword = "the first long password";
 const secondPassword = "the second long password";
+/** The address every request below claims to come from, as a host reports it. */
+const clientIp = "203.0.113.9";
+
+/** The log lines written so far for `event`. */
+function logLinesFor(event: string): Record<string, unknown>[] {
+  return logOutput.lines().filter((line) => line.event === event);
+}
 
 /**
  * Sends one request to Better Auth's HTTP endpoints, as a browser on the
@@ -40,7 +56,7 @@ async function callAuth(
   options: { method?: "GET" | "POST"; body?: unknown; cookie?: string } = {},
 ): Promise<Response> {
   const url = new URL(pathOrUrl, `${testBaseUrl}/api/auth/`);
-  const headers = new Headers({ Origin: testBaseUrl });
+  const headers = new Headers({ Origin: testBaseUrl, "X-Forwarded-For": clientIp });
   if (options.cookie) headers.set("Cookie", options.cookie);
   if (options.body !== undefined) headers.set("Content-Type", "application/json");
   return auth.handler(
@@ -152,6 +168,50 @@ describe("the login flow", () => {
     });
     expect(loggedIn.status).toBe(200);
     expect(await sessionHandle(sessionCookieFrom(loggedIn))).toBe(handle);
+
+    // Each step was logged, with the email (where the step has one) and
+    // where the request came from.
+    expect(logLinesFor("accounts.signup.succeeded")).toEqual([
+      expect.objectContaining({ level: "info", email }),
+    ]);
+    expect(logLinesFor("auth.login.failed")).toEqual([
+      expect.objectContaining({
+        level: "warn",
+        email,
+        reason: "EMAIL_NOT_VERIFIED",
+        ip: clientIp,
+      }),
+      expect.objectContaining({
+        level: "warn",
+        email,
+        reason: "INVALID_EMAIL_OR_PASSWORD",
+        ip: clientIp,
+      }),
+    ]);
+    expect(logLinesFor("auth.email-verification.succeeded")).toEqual([
+      expect.objectContaining({ level: "info", ip: clientIp }),
+    ]);
+    expect(logLinesFor("auth.logout.succeeded")).toHaveLength(1);
+    expect(logLinesFor("auth.password-reset.requested")).toEqual([
+      expect.objectContaining({ level: "info", email, ip: clientIp }),
+    ]);
+    expect(logLinesFor("auth.password-reset.succeeded")).toHaveLength(1);
+    expect(logLinesFor("auth.login.succeeded")).toEqual([
+      expect.objectContaining({ level: "info", email, memberId: expect.any(Number) }),
+    ]);
+
+    // Neither password appears anywhere in the log.
+    expect(logOutput.text()).not.toContain(firstPassword);
+    expect(logOutput.text()).not.toContain(secondPassword);
+  });
+
+  it("a bad verification link is logged as a failed verification", async () => {
+    const response = await callAuth("verify-email?token=not-a-real-token&callbackURL=/");
+
+    expect(response.status).toBe(302);
+    expect(logLinesFor("auth.email-verification.failed")).toContainEqual(
+      expect.objectContaining({ level: "warn", reason: "INVALID_TOKEN", ip: clientIp }),
+    );
   });
 
   it("Better Auth's own public signup endpoint is switched off", async () => {

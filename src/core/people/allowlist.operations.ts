@@ -13,6 +13,7 @@
  */
 import { type Database } from "@/db/client";
 import { type Actor } from "../shared/actor";
+import { type Logger } from "../shared/logger";
 import { requireRole } from "../shared/permissions";
 import { type Result, failure, ok } from "../shared/result";
 import { eq } from "drizzle-orm";
@@ -35,8 +36,14 @@ export async function isEmailOnAllowlist(
   return rows.length > 0;
 }
 
-/** Builds the allowlist operations around the given database. */
-export function createAllowlistOperations({ db }: { db: Database }) {
+/** Builds the allowlist operations around the given database and Logger. */
+export function createAllowlistOperations({
+  db,
+  logger,
+}: {
+  db: Database;
+  logger: Logger;
+}) {
   return {
     /**
      * Adds `email` to the allowlist. Admins only.
@@ -50,16 +57,22 @@ export function createAllowlistOperations({ db }: { db: Database }) {
       email: string,
     ): Promise<Result<void, "already-listed">> {
       requireRole(actor, "admin", "add an email to the allowlist");
+      const normalizedEmail = normalizeEmail(email);
 
       // ON CONFLICT DO NOTHING returns no row when the email exists, which
       // tells us it was already listed without a separate query.
       const inserted = await db
         .insert(allowlistEntry)
-        .values({ email: normalizeEmail(email) })
+        .values({ email: normalizedEmail })
         .onConflictDoNothing()
         .returning({ email: allowlistEntry.email });
 
-      if (inserted.length === 0) return failure("already-listed");
+      // Both at info: an Admin's own bookkeeping, not a security concern.
+      if (inserted.length === 0) {
+        logger.info("allowlist.email.already-listed", { email: normalizedEmail });
+        return failure("already-listed");
+      }
+      logger.info("allowlist.email.added", { email: normalizedEmail });
       return ok();
     },
   };

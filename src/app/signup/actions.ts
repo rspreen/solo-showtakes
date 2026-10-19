@@ -12,7 +12,7 @@
 import { redirect } from "next/navigation";
 import { type SignUpFailure } from "@/core/people/accounts.operations";
 import { getActor } from "@/server/actor";
-import { getServices } from "@/server/services";
+import { getOperations } from "@/server/operations";
 
 /** What the form shows after a submission that did not succeed. */
 export interface SignUpFormState {
@@ -32,10 +32,8 @@ export async function signUpAction(
     handle: textField(formData, "handle"),
   };
 
-  const result = await getServices().operations.accounts.signUp(
-    await getActor(),
-    details,
-  );
+  const operations = await getOperations();
+  const result = await operations.accounts.signUp(await getActor(), details);
   if (!result.ok) {
     return {
       failure: result.reason,

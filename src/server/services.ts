@@ -1,15 +1,18 @@
 /**
- * The web app's services (database, Better Auth, operations), built once
- * per server process from environment settings.
+ * The web app's services (database, Mailer, Logger, Better Auth), built
+ * once per server process from environment settings.
  *
- * Pages, server actions, and route handlers call `getServices()`. The
- * actual construction is in src/wiring/create-services.ts, shared with the
- * tests; this file only reads the settings and keeps one copy.
+ * Route handlers and src/server/ call `getServices()`; pages and server
+ * actions reach operations through `getOperations()` (./operations.ts),
+ * which adds the request's details to the Logger. The actual construction
+ * is in src/wiring/create-services.ts, shared with the tests; this file
+ * only reads the settings and keeps one copy.
  *
  * `import "server-only"` makes the build fail if browser code ever imports
  * this file, which would otherwise risk leaking secrets into the page.
  */
 import "server-only";
+import { createLoggerFromEnvironment } from "@/logging/create-logger";
 import { createMailerFromEnvironment } from "@/mail/create-mailer";
 import { type Services, createServices } from "@/wiring/create-services";
 
@@ -25,6 +28,7 @@ export function getServices(): Services {
   globalCache.showtakesServices ??= createServices({
     databaseUrl: requireSetting("DATABASE_URL"),
     mailer: createMailerFromEnvironment(),
+    logger: createLoggerFromEnvironment(),
     baseUrl: requireSetting("BETTER_AUTH_URL"),
     authSecret: requireSetting("BETTER_AUTH_SECRET"),
   });

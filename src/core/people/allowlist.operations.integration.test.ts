@@ -61,6 +61,11 @@ describe("allowlist.add", () => {
 
     expect(result.ok).toBe(true);
     expect(await isListed(email)).toBe(true);
+    expect(services.logger.entries).toContainEqual({
+      level: "info",
+      event: "allowlist.email.added",
+      fields: { email },
+    });
   });
 
   it("as Admin C, with stray capitals and spaces: stores the email normalised", async () => {
@@ -75,5 +80,10 @@ describe("allowlist.add", () => {
     const result = await operations.allowlist.add(adminC, email);
 
     expect(result).toEqual({ ok: false, reason: "already-listed" });
+    expect(services.logger.entries).toContainEqual({
+      level: "info",
+      event: "allowlist.email.already-listed",
+      fields: { email },
+    });
   });
 });

@@ -10,8 +10,10 @@
  * signup operation, which applies our rules first and then reaches Better
  * Auth through `member-account-creator.ts`.
  *
- * `createAuth` receives everything it needs (database, Mailer, settings), so
- * the web app and tests build it the same way (src/wiring/).
+ * `createAuth` receives everything it needs (database, Mailer, Logger,
+ * settings), so the web app and tests build it the same way (src/wiring/).
+ * Login outcomes are logged by `logging-hook.ts`, and Better Auth's own
+ * messages go to the same Logger (ADR 0006).
  */
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -21,6 +23,7 @@ import {
   minimumPasswordLength,
 } from "@/core/people/password";
 import { account, member, session, verification } from "@/core/people/schema";
+import { type Logger } from "@/core/shared/logger";
 import { type Database } from "@/db/client";
 import { type Mailer } from "@/mail/mailer";
 import {
@@ -28,12 +31,15 @@ import {
   passwordResetEmail,
   verificationEmail,
 } from "./emails";
+import { createAuthLoggingHook } from "./logging-hook";
 
 const oneDayInSeconds = 60 * 60 * 24;
 
 export interface AuthSettings {
   db: Database;
   mailer: Mailer;
+  /** Receives login outcomes and Better Auth's own messages. */
+  logger: Logger;
   /**
    * The site's public address, such as `https://showtakes.com`. Links in
    * emails point here, and Better Auth only accepts requests from it.
@@ -44,10 +50,23 @@ export interface AuthSettings {
 }
 
 /** Builds the Better Auth instance for the given database and Mailer. */
-export function createAuth({ db, mailer, baseUrl, secret }: AuthSettings) {
+export function createAuth({ db, mailer, logger, baseUrl, secret }: AuthSettings) {
   return betterAuth({
     baseURL: baseUrl,
     secret,
+
+    // Better Auth's own messages (such as "Invalid password", with no
+    // request details) become `auth.library.message` lines in our log.
+    // Its "debug" and "info" are both our `info`.
+    logger: {
+      log: (level, message, ...details) => {
+        const fields = { message, details: details.length > 0 ? details : undefined };
+        if (level === "error") logger.error("auth.library.message", fields);
+        else if (level === "warn") logger.warn("auth.library.message", fields);
+        else logger.info("auth.library.message", fields);
+      },
+    },
+    hooks: { after: createAuthLoggingHook(logger) },
 
     database: drizzleAdapter(db, {
       provider: "pg",

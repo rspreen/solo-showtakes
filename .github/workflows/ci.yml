@@ -42,6 +42,7 @@ jobs:
       BETTER_AUTH_URL: http://localhost:3000
       # Test-only value; a real secret is never stored in this file.
       BETTER_AUTH_SECRET: ci-only-secret-for-signing-test-tokens
+      LOG_LEVEL: info
 
     steps:
       - uses: actions/checkout@v7

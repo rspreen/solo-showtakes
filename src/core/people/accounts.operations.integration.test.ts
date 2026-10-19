@@ -4,7 +4,8 @@
  * Actor, sign up with some details, expect an outcome.
  *
  * The rest of the login flow (verify, log in, log out, reset) is tested in
- * src/auth/login-flow.integration.test.ts.
+ * src/auth/login-flow.integration.test.ts. What each outcome logs is read
+ * from the recording logger in `services.logger` (ADR 0006).
  */
 import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
@@ -54,6 +55,11 @@ describe("accounts.signUp", () => {
     });
 
     expect(result).toEqual({ ok: true, value: undefined });
+    expect(services.logger.entries).toContainEqual({
+      level: "info",
+      event: "accounts.signup.succeeded",
+      fields: { email: invitedEmail },
+    });
     const [created] = await db
       .select()
       .from(member)
@@ -92,6 +98,11 @@ describe("accounts.signUp", () => {
     });
 
     expect(result).toEqual({ ok: false, reason: "not-invited" });
+    expect(services.logger.entries).toContainEqual({
+      level: "warn",
+      event: "accounts.signup.refused",
+      fields: { reason: "not-invited", email: uninvitedEmail },
+    });
     const rows = await db
       .select()
       .from(member)

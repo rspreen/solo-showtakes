@@ -69,9 +69,10 @@ which they create and migrate themselves, and read emails from Mailpit.
 | `src/core/`       | Business rules and operations, one folder per area (ADR 0004)  |
 | `src/db/`         | Database connection, migrations, and test-database helpers     |
 | `src/mail/`       | Sending email: the Mailer interface and its two adapters       |
+| `src/logging/`    | Writing log lines: the Pino adapter and test helpers           |
 | `src/auth/`       | Better Auth setup: logins, sessions, verification, reset       |
 | `src/wiring/`     | Builds and connects the services; shared by app and tests      |
-| `src/server/`     | Server-only helpers for pages: the services, the current Actor |
+| `src/server/`     | Server-only helpers: services, operations, the current Actor   |
 | `e2e/`            | Browser tests                                                  |
 
 ### Business rules and operations
@@ -79,8 +80,10 @@ which they create and migrate themselves, and read emails from Mailpit.
 `src/core/` holds everything the site does, independent of the web pages
 (ADR 0002, ADR 0004). It has one folder per section of [CONTEXT.md](CONTEXT.md)
 (`people/`, later `catalog/` and `opinions/`), plus `shared/` for the Actor,
-permission checks, and the Result type. Pages reach it only through
-`createOperations({ db })` in `src/core/operations.ts`.
+permission checks, the Result type, and the Logger interface. Pages and
+server actions reach it only through `getOperations()` in
+`src/server/operations.ts`, which builds `createOperations()` from
+`src/core/operations.ts` for the current request.
 
 File names say what a file may do, and lint enforces it:
 
@@ -109,6 +112,26 @@ know who delivers it. `MAIL_PROVIDER` chooses the adapter and must be set:
 
 Integration tests check sent mail through `src/mail/testing/mailpit-inbox.ts`,
 each using its own unique recipient address.
+
+### Logging
+
+Events are written as one JSON line each through a `Logger`
+(`src/core/shared/logger.ts`, ADR 0006): successes at `info`, refusals and
+failed logins at `warn`, faults at `error`. Every event name is listed in
+that file. Lines carry the email involved and where the request came from
+(IP address, user agent, request id); passwords, tokens, and cookies are
+always redacted.
+
+- `LOG_LEVEL` (required) sets the quietest level written. `warn` hides
+  successes.
+- `LOG_FILE` also writes every line to a file. `.env.example` sets
+  `logs/showtakes.log`, which is not committed; the browser tests' server
+  writes `logs/e2e.log`. Production leaves it unset and sends standard
+  output to a log service.
+
+To follow the log while developing: `tail -f logs/showtakes.log`. Tests
+check what was logged with `services.logger.entries` from
+`createTestServices()`.
 
 ### Accounts and logins
 

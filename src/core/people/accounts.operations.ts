@@ -12,10 +12,14 @@
  * adapter that implements it lives in src/auth/. Keeping Better Auth behind
  * an interface means core code never depends on its types, and tests could
  * replace it.
+ *
+ * Every outcome is logged (ADR 0006): a refusal at `warn` with its reason
+ * and the email as entered (normalised), and a success at `info`.
  */
 import { eq } from "drizzle-orm";
 import { type Database } from "@/db/client";
 import { type Actor } from "../shared/actor";
+import { type Logger } from "../shared/logger";
 import { requireVisitor } from "../shared/permissions";
 import { type Result, failure, ok } from "../shared/result";
 import { isEmailOnAllowlist } from "./allowlist.operations";
@@ -59,9 +63,11 @@ export type SignUpFailure =
 export function createAccountOperations({
   db,
   accountCreator,
+  logger,
 }: {
   db: Database;
   accountCreator: MemberAccountCreator;
+  logger: Logger;
 }) {
   return {
     /**
@@ -80,16 +86,22 @@ export function createAccountOperations({
       requireVisitor(actor, "sign up");
 
       const email = normalizeEmail(details.email);
-      if (!looksLikeEmail(email)) return failure("invalid-email");
-      if (!(await isEmailOnAllowlist(db, email))) return failure("not-invited");
+      /** Logs why signup was refused, then returns that failure. */
+      const refuse = (reason: SignUpFailure) => {
+        logger.warn("accounts.signup.refused", { reason, email });
+        return failure(reason);
+      };
+
+      if (!looksLikeEmail(email)) return refuse("invalid-email");
+      if (!(await isEmailOnAllowlist(db, email))) return refuse("not-invited");
 
       const passwordCheck = checkPassword(details.password);
-      if (!passwordCheck.ok) return passwordCheck;
+      if (!passwordCheck.ok) return refuse(passwordCheck.reason);
 
       const parsedHandle = parseHandle(details.handle);
-      if (!parsedHandle.ok) return parsedHandle;
+      if (!parsedHandle.ok) return refuse(parsedHandle.reason);
       const handle = parsedHandle.value;
-      if (await isHandleTaken(db, handle)) return failure("handle-taken");
+      if (await isHandleTaken(db, handle)) return refuse("handle-taken");
 
       await accountCreator.createWithPassword({
         email,
@@ -97,6 +109,9 @@ export function createAccountOperations({
         handle,
         displayName: handle,
       });
+      // Also logged for an email that already had an account, since signup
+      // deliberately cannot tell the two apart.
+      logger.info("accounts.signup.succeeded", { email });
       return ok();
     },
   };

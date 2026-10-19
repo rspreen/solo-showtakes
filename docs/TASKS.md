@@ -38,7 +38,7 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
    - Handle is chosen at signup and must meet the format rules: 2-30 characters, letters, numbers, periods and underscores, starting with a letter or number, no consecutive periods, lowercased, unique.
    - Done when: an allowlisted email can sign up, verify, log out, reset the password, and log back in; a non-listed email is refused; handle rules are covered by unit tests.
 
-6. **Logging** (ADR 0006)
+6. **Logging** (ADR 0006; done 2026-10-18)
    - A Logger interface passed in like the database and Mailer, with a Pino adapter writing one JSON object per line to standard output, and also to `logs/showtakes.log` (not committed) in development. `LOG_LEVEL` sets which levels appear.
    - Named events with fixed fields: event, reason, email, IP address, user agent, Member id, and request id. Successes are logged at info, refusals and failed logins at warn, and faults at error.
    - Passwords, tokens, cookies, and authorization headers are always redacted.
@@ -57,7 +57,8 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
    - Handling a Resend outage or rate-limit failure (today `MailSendError` just fails the request; see `src/mail/`).
    - Rate-limit counters stored in the database (Better Auth's `database` rate-limit storage) rather than in memory, with limits on login, password reset requests, verification resends, and the signup server action (ADR 0006).
    - New passwords checked against known breaches (Better Auth's `haveibeenpwned` plugin), and a decision on whether signup goes ahead or is refused while that service is down.
-   - A log drain sending logs to a log service (Axiom, Better Stack, or similar), with a retention period of 30 to 90 days. Check which Vercel plans include log drains.
+   - A log drain sending logs to a log service (Axiom, Better Stack, or similar), with a retention period of 30 to 90 days. Check which Vercel plans include log drains. Set `LOG_LEVEL` in the host's settings (it is required), and leave `LOG_FILE` unset.
+   - Check that Vercel's `x-forwarded-for` holds the real client IP address in logs (`src/logging/request-context.ts`).
    - Done when: production signup works end to end on the real domain.
 
 9. **Backups**

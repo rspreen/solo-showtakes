@@ -17,12 +17,12 @@ const integrationTestPattern = "src/**/*.integration.test.ts";
 export default defineConfig({
   resolve: {
     // Mirror the `@/` import alias from tsconfig.json so tests resolve
-    // `@/domain/...` the same way the app does.
+    // `@/core/...` the same way the app does.
     alias: { "@": path.resolve(import.meta.dirname, "src") },
   },
   test: {
-    // Plain Node, no simulated browser: domain and operations code must not
-    // need one (ADR 0002).
+    // Plain Node, no simulated browser: business rules and operations
+    // (src/core) must not need one (ADR 0002).
     environment: "node",
     projects: [
       {
