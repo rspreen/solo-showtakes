@@ -43,6 +43,40 @@ export async function messagesTo(address: string): Promise<InboxMessage[]> {
   return reply.messages;
 }
 
+/**
+ * Waits briefly for an email to `address` whose subject contains
+ * `subjectPart`, and returns its plain-text body. Fails with the subjects
+ * that did arrive if none matches.
+ */
+export async function textOfEmailTo(
+  address: string,
+  subjectPart: string,
+): Promise<string> {
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const messages = await messagesTo(address);
+    const match = messages.find((message) => message.Subject.includes(subjectPart));
+    if (match) {
+      const message = (await callMailpit(
+        new URL(`/api/v1/message/${match.ID}`, mailpitUrl()),
+        { method: "GET" },
+      )) as { Text: string };
+      return message.Text;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  const subjects = (await messagesTo(address)).map((message) => message.Subject);
+  throw new Error(
+    `No email to ${address} with "${subjectPart}" in its subject. Received: ${JSON.stringify(subjects)}`,
+  );
+}
+
+/** Returns the first http(s) link in `text`, failing if there is none. */
+export function firstLinkIn(text: string): string {
+  const link = /https?:\/\/\S+/.exec(text)?.[0];
+  if (!link) throw new Error(`No link found in email text: ${text}`);
+  return link;
+}
+
 /** Deletes every message addressed to `address`. */
 export async function deleteMessagesTo(address: string): Promise<void> {
   const ids = (await messagesTo(address)).map((message) => message.ID);

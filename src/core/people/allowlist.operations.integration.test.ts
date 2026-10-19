@@ -6,15 +6,13 @@
 import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { afterAll, afterEach, describe, expect, it } from "vitest";
-import { connectToTestDatabase } from "@/db/testing/test-database";
-import { createOperations } from "../operations";
+import { createTestServices } from "@/wiring/testing/test-services";
 import { memberActor, visitor } from "../shared/actor";
 import { PermissionRefusedError } from "../shared/permissions";
 import { allowlistEntry } from "./schema";
 
-const connection = connectToTestDatabase();
-const { db } = connection;
-const operations = createOperations({ db });
+const services = createTestServices();
+const { db, operations } = services;
 
 const memberA = memberActor(1);
 const curatorB = memberActor(2, ["curator"]);
@@ -36,7 +34,7 @@ afterEach(async () => {
   await db.delete(allowlistEntry).where(eq(allowlistEntry.email, email));
 });
 
-afterAll(() => connection.close());
+afterAll(() => services.close());
 
 describe("allowlist.add", () => {
   it("as Member A, without the admin role: refused", async () => {
@@ -62,6 +60,12 @@ describe("allowlist.add", () => {
     const result = await operations.allowlist.add(adminC, email);
 
     expect(result.ok).toBe(true);
+    expect(await isListed(email)).toBe(true);
+  });
+
+  it("as Admin C, with stray capitals and spaces: stores the email normalised", async () => {
+    await operations.allowlist.add(adminC, `  ${email.toUpperCase()} `);
+
     expect(await isListed(email)).toBe(true);
   });
 

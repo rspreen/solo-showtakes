@@ -38,6 +38,9 @@ jobs:
       MAIL_PROVIDER: mailpit
       MAIL_FROM: noreply@showtakes.test
       MAILPIT_URL: http://localhost:8025
+      BETTER_AUTH_URL: http://localhost:3000
+      # Test-only value; a real secret is never stored in this file.
+      BETTER_AUTH_SECRET: ci-only-secret-for-signing-test-tokens
 
     steps:
       - uses: actions/checkout@v7

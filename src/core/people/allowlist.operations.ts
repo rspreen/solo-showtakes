@@ -14,7 +14,25 @@ import { type Database } from "@/db/client";
 import { type Actor } from "../shared/actor";
 import { requireRole } from "../shared/permissions";
 import { type Result, failure, ok } from "../shared/result";
+import { eq } from "drizzle-orm";
+import { normalizeEmail } from "./email";
 import { allowlistEntry } from "./schema";
+
+/**
+ * True when `email` is on the allowlist. Not an operation (it takes no
+ * Actor): it is the shared check behind signup (`accounts.operations.ts`)
+ * and Better Auth's account-creation guard (src/auth/auth.ts).
+ */
+export async function isEmailOnAllowlist(
+  db: Database,
+  email: string,
+): Promise<boolean> {
+  const rows = await db
+    .select({ email: allowlistEntry.email })
+    .from(allowlistEntry)
+    .where(eq(allowlistEntry.email, normalizeEmail(email)));
+  return rows.length > 0;
+}
 
 /** Builds the allowlist operations around the given database. */
 export function createAllowlistOperations({ db }: { db: Database }) {
@@ -24,8 +42,7 @@ export function createAllowlistOperations({ db }: { db: Database }) {
      *
      * Returns `already-listed` if the email is on the list already; an Admin
      * can do that through a correct page, so it is an expected failure.
-     * Emails are stored as given: lowercasing and trimming arrive with
-     * signup in ticket 5.
+     * The email is trimmed and lowercased first, as signup does.
      */
     async add(
       actor: Actor,
@@ -37,7 +54,7 @@ export function createAllowlistOperations({ db }: { db: Database }) {
       // tells us it was already listed without a separate query.
       const inserted = await db
         .insert(allowlistEntry)
-        .values({ email })
+        .values({ email: normalizeEmail(email) })
         .onConflictDoNothing()
         .returning({ email: allowlistEntry.email });
 

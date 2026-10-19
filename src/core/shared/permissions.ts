@@ -49,6 +49,19 @@ export function requireMember(
 }
 
 /**
+ * Refuses unless `actor` is a Visitor, for actions that only make sense
+ * when logged out (signing up). `action` describes what was attempted.
+ */
+export function requireVisitor(actor: Actor, action: string): void {
+  if (actor.kind !== "visitor") {
+    throw new PermissionRefusedError(
+      "not-permitted",
+      `Member ${actor.memberId} tried to ${action}; only Visitors may.`,
+    );
+  }
+}
+
+/**
  * Refuses unless `actor` is a Member holding `role`. `action` describes what
  * was attempted ("add an email to the allowlist"), for the error message.
  */

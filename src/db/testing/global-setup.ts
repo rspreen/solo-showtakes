@@ -4,8 +4,9 @@
  *
  * It creates a brand-new, uniquely named database on the Postgres server at
  * DATABASE_URL, applies every migration in `src/db/migrations/`, and hands
- * its URL to the tests (read it with `connectToTestDatabase()` from
- * `./test-database.ts`). When the run ends, the database is dropped. The
+ * its URL to the tests (`createTestServices()` in
+ * src/wiring/testing/test-services.ts builds the site around it). When the
+ * run ends, the database is dropped. The
  * development database itself is never touched.
  *
  * Leftovers: a run that is killed (Ctrl-C, crash, Docker stopping) never

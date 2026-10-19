@@ -8,6 +8,7 @@ import {
   PermissionRefusedError,
   requireMember,
   requireRole,
+  requireVisitor,
 } from "./permissions";
 
 /** Runs `check` and returns the PermissionRefusedError it throws. */
@@ -29,6 +30,17 @@ describe("requireMember", () => {
 
   it("allows any Member", () => {
     expect(() => requireMember(memberActor(1), "rate")).not.toThrow();
+  });
+});
+
+describe("requireVisitor", () => {
+  it("refuses a logged-in Member", () => {
+    const refusal = refusalFrom(() => requireVisitor(memberActor(1), "sign up"));
+    expect(refusal.reason).toBe("not-permitted");
+  });
+
+  it("allows a Visitor", () => {
+    expect(() => requireVisitor(visitor, "sign up")).not.toThrow();
   });
 });
 

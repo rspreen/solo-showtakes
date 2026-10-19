@@ -31,7 +31,7 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
    - A mail interface with two adapters: a local inbox tool for development and Resend or Postmark for production. (Chosen: Mailpit and Resend.)
    - Done when: a test email from local development appears in the local inbox and nowhere else.
 
-5. **Accounts and the invite allowlist**
+5. **Accounts and the invite allowlist** (ADR 0005; done 2026-10-18)
    - Better Auth with email and password, email verification, password reset, and long-lived sessions.
    - Signup works only for emails on the allowlist.
    - Handle is chosen at signup and must meet the format rules: 2-30 characters, letters, numbers, periods and underscores, starting with a letter or number, no consecutive periods, lowercased, unique.
