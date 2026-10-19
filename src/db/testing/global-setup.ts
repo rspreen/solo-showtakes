@@ -1,6 +1,6 @@
 /**
  * Vitest global setup for integration tests: runs once per `pnpm test`, before
- * any `*.integration.test.ts` file (wired up in vitest.config.mts).
+ * any `*.integration.test.ts` file (wired up in vitest.config.ts).
  *
  * It creates a brand-new, uniquely named database on the Postgres server at
  * DATABASE_URL, applies every migration in `src/db/migrations/`, and hands

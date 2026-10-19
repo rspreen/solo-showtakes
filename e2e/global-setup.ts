@@ -30,9 +30,8 @@ export default async function globalSetup(): Promise<void> {
   await client.connect();
   try {
     await migrate(drizzle({ client }), {
-      // __dirname, not import.meta.dirname: Playwright loads this file as
-      // CommonJS, because package.json does not declare "type": "module".
-      migrationsFolder: path.resolve(__dirname, "../src/db/migrations"),
+      // import.meta.dirname is the folder this file is in (e2e/).
+      migrationsFolder: path.resolve(import.meta.dirname, "../src/db/migrations"),
     });
   } finally {
     await client.end();
