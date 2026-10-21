@@ -50,10 +50,12 @@ jobs:
       # Installs the pnpm version pinned in package.json ("packageManager").
       - uses: pnpm/action-setup@v6
 
-      # Node 24 is the current long-term-support release, matching production.
+      # Node 24, the current long-term-support release, from .node-version:
+      # the same file your Mac's version manager reads. Vercel reads
+      # "engines" in package.json, which must name the same major version.
       - uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version-file: .node-version
           cache: pnpm
 
       # --frozen-lockfile fails if package.json and pnpm-lock.yaml disagree,
@@ -72,7 +74,23 @@ jobs:
       - run: pnpm test
 
       # Browser tests run against the production build.
+      #
+      # The build runs with every runtime setting blanked, as on Vercel,
+      # where secrets such as DATABASE_URL may be missing at build time.
+      # This fails the build if a page reaches the database, email, or
+      # login secrets while it is prebuilt. (Blank counts as "not set" in
+      # src/wiring/create-services-from-environment.ts.) The browser tests
+      # below still get the real settings, because the server reads them
+      # when it starts, not when it is built.
       - run: pnpm build
+        env:
+          DATABASE_URL: ""
+          MAIL_PROVIDER: ""
+          MAIL_FROM: ""
+          MAILPIT_URL: ""
+          BETTER_AUTH_URL: ""
+          BETTER_AUTH_SECRET: ""
+          LOG_LEVEL: ""
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
 

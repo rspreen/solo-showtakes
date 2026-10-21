@@ -8,7 +8,8 @@ Ratings, reviews, and discussion of theatre productions: Letterboxd for the stag
 
 ## Requirements
 
-- Node.js 24 or newer
+- Node.js 24 (pinned in `.node-version` for local development and CI, and in
+  `engines` in `package.json` for Vercel; change all three together)
 - pnpm (version pinned in `package.json`)
 - OrbStack (or another Docker runtime) for the local Postgres database and
   Mailpit email inbox
