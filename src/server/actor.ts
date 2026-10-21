@@ -32,8 +32,15 @@ export interface CurrentMember {
  * Cached per request.
  */
 export const getCurrentMember = cache(async (): Promise<CurrentMember | null> => {
+  // Read the request's headers before touching the services. While the
+  // build prerenders a page, `headers()` stops rendering here (the part is
+  // filled in at request time instead), so the services, which need
+  // DATABASE_URL and the other secrets, are never built during the build.
+  // Written the other way round, JavaScript would call getServices() before
+  // evaluating the `headers` argument.
+  const requestHeaders = await headers();
   const session = await getServices().auth.api.getSession({
-    headers: await headers(),
+    headers: requestHeaders,
   });
   if (!session) return null;
   return {
