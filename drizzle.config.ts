@@ -6,15 +6,24 @@
  * - `pnpm db:migrate` applies pending migrations to the database at
  *   DATABASE_URL (read from `.env`; see `.env.example`).
  *
+ * On Vercel, `pnpm db:migrate` runs before every build (vercel.json;
+ * ADR 0008), against production or the preview's own Neon branch.
+ * There it uses DATABASE_URL_UNPOOLED, Neon's direct connection, set by the
+ * Neon integration: Neon advises schema changes over a direct connection
+ * rather than through its connection pooler, which the site itself uses.
+ * Locally and in CI there is no pooler, so DATABASE_URL is used.
+ *
  * Tests apply the same migrations from code instead (src/db/testing/).
  */
 import "dotenv/config";
 import { defineConfig } from "drizzle-kit";
 
-const databaseUrl = process.env.DATABASE_URL;
+const databaseUrl =
+  process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL;
 if (!databaseUrl) {
   throw new Error(
-    "DATABASE_URL is not set. Copy .env.example to .env (cp .env.example .env).",
+    "DATABASE_URL is not set. Locally, copy .env.example to .env " +
+      "(cp .env.example .env). On Vercel, link the Neon integration.",
   );
 }
 

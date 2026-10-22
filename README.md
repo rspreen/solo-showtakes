@@ -39,7 +39,7 @@ pnpm dev                                # http://localhost:3000
 | `pnpm services:up`   | Start local Postgres and the Mailpit inbox               |
 | `pnpm services:down` | Stop them (database data is kept in a Docker volume)     |
 | `pnpm db:generate`   | Write a SQL migration from changes to any `schema.ts`    |
-| `pnpm db:migrate`    | Apply pending migrations to `DATABASE_URL`               |
+| `pnpm db:migrate`    | Apply pending migrations to `DATABASE_URL` (Vercel runs it before each build; ADR 0008) |
 | `pnpm db:studio`     | Browse the database in Drizzle Studio                    |
 | `pnpm admin:promote` | Make a signed-up Member an Admin: `... you@example.com`  |
 
@@ -77,6 +77,7 @@ which they create and migrate themselves, and read emails from Mailpit.
 | `src/server/`     | Server-only helpers: services, operations, the current Actor   |
 | `scripts/`        | Command-line scripts, acting as the operator (ADR 0007)        |
 | `e2e/`            | Browser tests                                                  |
+| `vercel.json`     | Vercel settings: migrate, then build; functions in iad1        |
 
 ### Business rules and operations
 
