@@ -25,7 +25,11 @@ export default defineConfig({
   testDir: "e2e",
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
-  reporter: isCI ? "github" : "list",
+  // In CI: "github" turns results into annotations on the run's page, and
+  // "html" writes playwright-report/ (with screenshots and traces of
+  // failures), which ci.yml uploads when a run fails. Download it from the
+  // run's page and open it with `pnpm exec playwright show-report <folder>`.
+  reporter: isCI ? [["github"], ["html", { open: "never" }]] : "list",
   globalSetup: "./e2e/global-setup.ts",
   use: {
     baseURL,
