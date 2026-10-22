@@ -5,6 +5,7 @@ Ratings, reviews, and discussion of theatre productions: Letterboxd for the stag
 - Domain language: [CONTEXT.md](CONTEXT.md)
 - Architecture decisions: [docs/adr/](docs/adr/)
 - Ordered work list: [docs/TASKS.md](docs/TASKS.md)
+- Guides to how the tooling works: [docs/learning/](docs/learning/)
 
 ## Requirements
 
