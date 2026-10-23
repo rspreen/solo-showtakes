@@ -43,6 +43,7 @@ pnpm dev                                # http://localhost:3000
 | `pnpm db:migrate`    | Apply pending migrations to `DATABASE_URL` (Vercel runs it before each build; ADR 0008) |
 | `pnpm db:studio`     | Browse the database in Drizzle Studio                    |
 | `pnpm admin:promote` | Make a signed-up Member an Admin: `... you@example.com`  |
+| `pnpm allowlist:add` | Let an email sign up: `... friend@example.com`           |
 
 ### Database tests
 
@@ -147,9 +148,9 @@ browser (`src/auth/client.ts`); signup goes through
 `operations.accounts.signUp`, which applies the invite allowlist and handle
 rules first (ADR 0005).
 
-To try it locally: add your email to the allowlist (for now,
-`pnpm db:studio` or SQL; the admin screen comes with the "Admin: members and
-allowlist" ticket), sign up at http://localhost:3000/signup, and open the
+To try it locally: add your email to the allowlist with
+`pnpm allowlist:add you@example.com` (the admin screen comes with the
+"Admin: members and allowlist" ticket), sign up at http://localhost:3000/signup, and open the
 verification email in Mailpit at http://localhost:8025.
 
 ### Roles and scripts
@@ -163,6 +164,15 @@ Scripts in `scripts/` run with `tsx` and act as the operator (ADR 0007):
 they call the same operations as the site, which let the operator through
 wherever an Admin may act. Web code can never act as the operator; lint and
 the permission checks both refuse it.
+
+Scripts run against the database in `DATABASE_URL`. To run one against
+production, put production's direct address (`DATABASE_URL_UNPOOLED` in
+Vercel's settings) in front of the command; a setting in the shell takes
+priority over `.env`:
+
+```sh
+DATABASE_URL='<production address>' pnpm allowlist:add friend@example.com
+```
 
 ### Generated shadcn/ui code
 
