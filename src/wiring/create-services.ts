@@ -38,8 +38,8 @@ export interface ServiceSettings {
   authSecret: string;
   /**
    * Whether to refuse requests that come too often (src/rate-limit/).
-   * On in production builds only, as Better Auth does by default, so
-   * development and most tests are never throttled.
+   * From the RATE_LIMITING setting: on in production, off in `.env` for
+   * development, off in tests (./testing/test-services.ts).
    */
   rateLimiting: boolean;
 }

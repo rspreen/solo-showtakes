@@ -5,7 +5,7 @@
  *
  * Uses the same database-backed limiter as Better Auth
  * (src/rate-limit/rate-limiter.ts, built in src/wiring/create-services.ts),
- * counted per IP address. Outside production builds the limiter allows
+ * counted per IP address. With RATE_LIMITING=off the limiter allows
  * everything.
  *
  *   if (await isOverRateLimit("signup", signupRateLimit)) {

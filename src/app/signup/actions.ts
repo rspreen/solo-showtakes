@@ -18,7 +18,7 @@ import { isOverRateLimit } from "@/server/rate-limit";
 /**
  * Signup attempts allowed per IP address: 10 in 10 minutes. Enough for
  * typos and taken handles; refused attempts count too, so someone trying
- * many emails in bulk is stopped. (Production builds only.)
+ * many emails in bulk is stopped. (Only when RATE_LIMITING is on.)
  */
 const signupRateLimit = { window: 10 * 60, max: 10 };
 

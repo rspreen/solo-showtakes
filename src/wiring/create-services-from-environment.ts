@@ -19,10 +19,20 @@ export function createServicesFromEnvironment(): Services {
     logger: createLoggerFromEnvironment(),
     baseUrl: requireSetting("BETTER_AUTH_URL"),
     authSecret: requireSetting("BETTER_AUTH_SECRET"),
-    // `next start` and Vercel run with NODE_ENV=production; `next dev`,
-    // tests, and scripts do not.
-    rateLimiting: process.env.NODE_ENV === "production",
+    rateLimiting: rateLimitingFrom(process.env.RATE_LIMITING),
   });
+}
+
+/**
+ * Reads the RATE_LIMITING setting: "on" or "off", and on when missing, so
+ * production (which does not set it) can never lose its limits through a
+ * forgotten setting. `.env` turns it off for development. Anything else is
+ * a typo and stops the server with a message.
+ */
+export function rateLimitingFrom(setting: string | undefined): boolean {
+  if (setting === undefined || setting === "" || setting === "on") return true;
+  if (setting === "off") return false;
+  throw new Error(`RATE_LIMITING must be "on" or "off"; got "${setting}".`);
 }
 
 /** Returns an environment setting, or throws if it is missing. */

@@ -138,14 +138,15 @@ always redacted.
 
 ### Rate limiting
 
-Production builds refuse requests that come too often from one IP address
-(`src/rate-limit/`, ADR 0006): Better Auth's login, password reset, and
+With `RATE_LIMITING=on`, the site refuses requests that come too often from
+one IP address (`src/rate-limit/`, ADR 0006): Better Auth's login, password reset, and
 verification endpoints, with its default limits (`src/auth/auth.ts`), and
 the signup form, 10 attempts in 10 minutes (`src/app/signup/actions.ts`).
 Counts are kept in the `rate_limit_counter` table, so every server copy on
 Vercel sees the same ones. Each refusal is logged as `request.rate-limited`.
-`pnpm dev` and the tests run without limits; `pnpm start` (and CI's
-browser tests) run with them.
+The setting is on when missing, as in production;
+`.env.example` sets it to `off` for development, and integration tests run
+without limits. CI's browser tests run with them on.
 
 To follow the log while developing: `tail -f logs/showtakes.log`. Tests
 check what was logged with `services.logger.entries` from

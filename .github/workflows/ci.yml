@@ -43,6 +43,9 @@ jobs:
       # Test-only value; a real secret is never stored in this file.
       BETTER_AUTH_SECRET: ci-only-secret-for-signing-test-tokens
       LOG_LEVEL: info
+      # Unlike .env.example: the browser tests run with the limits on, as
+      # production does (src/rate-limit/).
+      RATE_LIMITING: "on"
 
     steps:
       - uses: actions/checkout@v7
@@ -91,6 +94,7 @@ jobs:
           BETTER_AUTH_URL: ""
           BETTER_AUTH_SECRET: ""
           LOG_LEVEL: ""
+          RATE_LIMITING: ""
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
 
