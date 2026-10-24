@@ -14,20 +14,27 @@ import "server-only";
 import { headers } from "next/headers";
 import { cache } from "react";
 import { type Operations } from "@/core/operations";
+import { type Logger } from "@/core/shared/logger";
 import { requestContextFrom } from "@/logging/request-context";
 import { getCurrentMember } from "./actor";
 import { getServices } from "./services";
 
-/** Returns the operations for this request. Cached per request. */
-export const getOperations = cache(async (): Promise<Operations> => {
-  const services = getServices();
+/**
+ * Returns a Logger carrying this request's details, for server code that
+ * logs outside an operation (such as ./rate-limit.ts). Cached per request.
+ */
+export const getRequestLogger = cache(async (): Promise<Logger> => {
   const [requestHeaders, currentMember] = await Promise.all([
     headers(),
     getCurrentMember(),
   ]);
-  const requestLogger = services.logger.child({
+  return getServices().logger.child({
     ...requestContextFrom(requestHeaders),
     memberId: currentMember?.memberId,
   });
-  return services.operationsFor(requestLogger);
+});
+
+/** Returns the operations for this request. Cached per request. */
+export const getOperations = cache(async (): Promise<Operations> => {
+  return getServices().operationsFor(await getRequestLogger());
 });

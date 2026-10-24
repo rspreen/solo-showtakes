@@ -34,7 +34,7 @@ export function LoginForm() {
       router.refresh();
       return { email };
     }
-    return { email, message: messageFor(error.code) };
+    return { email, message: messageFor(error) };
   }
 
   const [state, formAction, pending] = useActionState(logIn, { email: "" });
@@ -67,9 +67,13 @@ export function LoginForm() {
   );
 }
 
-/** Explains a Better Auth login error code to the Member. */
-function messageFor(code: string | undefined): string {
-  switch (code) {
+/** Explains a Better Auth login error to the Member. */
+function messageFor(error: { code?: string; status: number }): string {
+  // Refused by the rate limit (src/auth/auth.ts); it sends no code.
+  if (error.status === 429) {
+    return "Too many attempts. Please wait a few minutes and try again.";
+  }
+  switch (error.code) {
     case "INVALID_EMAIL_OR_PASSWORD":
       return "That email and password do not match an account.";
     case "EMAIL_NOT_VERIFIED":

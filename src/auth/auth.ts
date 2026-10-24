@@ -26,6 +26,7 @@ import { account, member, session, verification } from "@/core/people/schema";
 import { type Logger } from "@/core/shared/logger";
 import { type Database } from "@/db/client";
 import { type Mailer } from "@/mail/mailer";
+import { type RateLimiter } from "@/rate-limit/rate-limiter";
 import {
   existingAccountEmail,
   passwordResetEmail,
@@ -47,10 +48,19 @@ export interface AuthSettings {
   baseUrl: string;
   /** Secret for signing tokens and cookies, from BETTER_AUTH_SECRET. */
   secret: string;
+  /** Where request counts are kept, or null to switch rate limiting off. */
+  rateLimiter: RateLimiter | null;
 }
 
 /** Builds the Better Auth instance for the given database and Mailer. */
-export function createAuth({ db, mailer, logger, baseUrl, secret }: AuthSettings) {
+export function createAuth({
+  db,
+  mailer,
+  logger,
+  baseUrl,
+  secret,
+  rateLimiter,
+}: AuthSettings) {
   return betterAuth({
     baseURL: baseUrl,
     secret,
@@ -127,6 +137,19 @@ export function createAuth({ db, mailer, logger, baseUrl, secret }: AuthSettings
       // Clicking the link logs the new Member straight in.
       autoSignInAfterVerification: true,
     },
+
+    // Requests to these endpoints are limited per IP address and path,
+    // with counts in our database (src/rate-limit/) rather than Better
+    // Auth's default of each server's memory. The limits are Better Auth's
+    // own defaults:
+    // - /sign-in/*: 3 per 10 seconds.
+    // - /request-password-reset, /send-verification-email: 3 per minute.
+    // - everything else under /api/auth: 100 per 10 seconds.
+    // A refused request gets HTTP 429, logged by the route handler
+    // (src/app/api/auth/[...all]/route.ts).
+    rateLimit: rateLimiter
+      ? { enabled: true, customStorage: rateLimiter }
+      : { enabled: false },
 
     // Signup must go through the signup operation (our rules), so Better
     // Auth's own public signup endpoint is switched off. Server code can

@@ -13,10 +13,24 @@ import { redirect } from "next/navigation";
 import { type SignUpFailure } from "@/core/people/accounts.operations";
 import { getActor } from "@/server/actor";
 import { getOperations } from "@/server/operations";
+import { isOverRateLimit } from "@/server/rate-limit";
+
+/**
+ * Signup attempts allowed per IP address: 10 in 10 minutes. Enough for
+ * typos and taken handles; refused attempts count too, so someone trying
+ * many emails in bulk is stopped. (Production builds only.)
+ */
+const signupRateLimit = { window: 10 * 60, max: 10 };
+
+/**
+ * Why signup did not go ahead: a reason from the signup operation, or
+ * "too-many-attempts" from the rate limit checked here first.
+ */
+export type SignUpFormFailure = SignUpFailure | "too-many-attempts";
 
 /** What the form shows after a submission that did not succeed. */
 export interface SignUpFormState {
-  failure?: SignUpFailure;
+  failure?: SignUpFormFailure;
   /** What was typed, so the form can keep it (never the password). */
   values: { email: string; handle: string };
 }
@@ -31,6 +45,15 @@ export async function signUpAction(
     password: textField(formData, "password"),
     handle: textField(formData, "handle"),
   };
+
+  // Checked before the operation, so a refused attempt costs no password
+  // hashing or email lookups.
+  if (await isOverRateLimit("signup", signupRateLimit)) {
+    return {
+      failure: "too-many-attempts",
+      values: { email: details.email, handle: details.handle },
+    };
+  }
 
   const operations = await getOperations();
   const result = await operations.accounts.signUp(await getActor(), details);

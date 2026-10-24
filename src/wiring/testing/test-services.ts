@@ -43,6 +43,9 @@ export function createTestServicesWithLogger<TLogger extends Logger>(
     logger,
     baseUrl: testBaseUrl,
     authSecret: "test-only-secret-for-signing-tokens-0123456789",
+    // Off, so tests can repeat logins freely; the limiter has its own
+    // tests (src/rate-limit/).
+    rateLimiting: false,
   });
   return { ...services, logger, operations: services.operationsFor(logger) };
 }

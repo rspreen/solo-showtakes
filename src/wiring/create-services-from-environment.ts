@@ -19,6 +19,9 @@ export function createServicesFromEnvironment(): Services {
     logger: createLoggerFromEnvironment(),
     baseUrl: requireSetting("BETTER_AUTH_URL"),
     authSecret: requireSetting("BETTER_AUTH_SECRET"),
+    // `next start` and Vercel run with NODE_ENV=production; `next dev`,
+    // tests, and scripts do not.
+    rateLimiting: process.env.NODE_ENV === "production",
   });
 }
 

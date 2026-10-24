@@ -55,7 +55,7 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
    - Vercel, Neon Postgres, Cloudflare R2, and the email provider, with DNS for showtakes.com.
    - A preview deployment per branch.
    - Handling a Resend outage or rate-limit failure (today `MailSendError` just fails the request; see `src/mail/`).
-   - Rate-limit counters stored in the database (Better Auth's `database` rate-limit storage) rather than in memory, with limits on login, password reset requests, verification resends, and the signup server action (ADR 0006).
+   - (done 2026-10-24) Rate-limit counters stored in the database rather than in memory, with limits on login, password reset requests, verification resends, and the signup server action (ADR 0006). Our own limiter (`src/rate-limit/`) serves both Better Auth and the signup action.
    - New passwords checked against known breaches (Better Auth's `haveibeenpwned` plugin), and a decision on whether signup goes ahead or is refused while that service is down.
    - Neon Launch plan (pay for what you use; 7-day restore window), AWS us-east-1, Postgres 17 to match local and CI, pausing when idle, connected through Neon's pooled connection address. Vercel functions in the matching region (iad1, Washington, D.C.), near the East Coast theatre audience.
    - DNS for showtakes.com hosted in our own Cloudflare account (Free plan); the domain stays registered at Porkbun. Required for R2's custom image address (`images.showtakes.com`), since R2 only attaches domains in its own Cloudflare account. Vercel's records are set to "DNS only", not proxied.
@@ -179,6 +179,7 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
 
 Minor improvements, picked up whenever convenient.
 
+- Dependency vulnerabilities: `pnpm audit` (2026-10-24) still reports high and moderate findings in packages we do not depend on directly (body-parser, undici, zod, esbuild, fast-uri, ip-address). Check which reach production, update what the 7-day minimum release age allows, and consider Dependabot alerts.
 - (done 2026-10-19) Signup password field: show a standard "acceptable" indicator, such as a check mark, once the typed password meets the rules (12 to 128 characters, from `src/core/people/password.ts`), so people know they can stop editing it. Also on the reset page's new-password field.
 
 ## Next: after the MVP

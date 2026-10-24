@@ -74,6 +74,7 @@ which they create and migrate themselves, and read emails from Mailpit.
 | `src/db/`         | Database connection, migrations, and test-database helpers     |
 | `src/mail/`       | Sending email: the Mailer interface and its two adapters       |
 | `src/logging/`    | Writing log lines: the Pino adapter and test helpers           |
+| `src/rate-limit/` | Refusing requests that come too often, counted in the database |
 | `src/auth/`       | Better Auth setup: logins, sessions, verification, reset       |
 | `src/wiring/`     | Builds and connects the services; shared by app and tests      |
 | `src/server/`     | Server-only helpers: services, operations, the current Actor   |
@@ -134,6 +135,17 @@ always redacted.
   `logs/showtakes.log`, which is not committed; the browser tests' server
   writes `logs/e2e.log`. Production leaves it unset and sends standard
   output to a log service.
+
+### Rate limiting
+
+Production builds refuse requests that come too often from one IP address
+(`src/rate-limit/`, ADR 0006): Better Auth's login, password reset, and
+verification endpoints, with its default limits (`src/auth/auth.ts`), and
+the signup form, 10 attempts in 10 minutes (`src/app/signup/actions.ts`).
+Counts are kept in the `rate_limit_counter` table, so every server copy on
+Vercel sees the same ones. Each refusal is logged as `request.rate-limited`.
+`pnpm dev` and the tests run without limits; `pnpm start` (and CI's
+browser tests) run with them.
 
 To follow the log while developing: `tail -f logs/showtakes.log`. Tests
 check what was logged with `services.logger.entries` from

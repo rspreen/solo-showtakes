@@ -46,7 +46,11 @@ export type LogEvent =
   | "auth.library.message"
   // A server request that failed with an unhandled error
   // (src/instrumentation.ts).
-  | "request.failed";
+  | "request.failed"
+  // A request refused for coming too often (src/rate-limit/): from Better
+  // Auth's endpoints (src/app/api/auth/[...all]/route.ts) or the signup
+  // action (src/server/rate-limit.ts).
+  | "request.rate-limited";
 
 /** Where a request came from; attached to every line a request logs. */
 export interface RequestLogFields {

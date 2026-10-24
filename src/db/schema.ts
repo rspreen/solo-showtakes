@@ -1,5 +1,6 @@
 /**
- * Every database table, gathered from the areas of `src/core/`.
+ * Every database table, gathered from the areas of `src/core/` and from
+ * `src/rate-limit/`, which is infrastructure rather than a domain area.
  *
  * Tables are defined next to the code that uses them (`src/core/<area>/
  * schema.ts`, ADR 0004). This file re-exports them all so that drizzle-kit
@@ -11,3 +12,4 @@
  * outside the app's build and does not know the `@/` alias.
  */
 export * from "../core/people/schema";
+export * from "../rate-limit/schema";

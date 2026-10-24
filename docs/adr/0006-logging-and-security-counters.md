@@ -16,7 +16,7 @@ Showtakes needs a record of what happened, for diagnosing faults and spotting ab
 
 **The database keeps only the small counters the site acts on in real time**, which expire quickly:
 
-- Rate-limit counters per IP address and endpoint, in Better Auth's `database` rate-limit storage. This replaces its in-memory store, which each serverless instance would keep separately.
+- Rate-limit counters per IP address and endpoint, in our own `rate_limit_counter` table (`src/rate-limit/`), which Better Auth uses through its `customStorage` option and the signup server action uses directly. This replaces Better Auth's in-memory store, which each serverless instance would keep separately. (First planned as Better Auth's built-in `database` storage; changed so that one limiter serves both, since Better Auth's limiter never sees server actions.)
 - A failed-login counter per account, which slows logins for that email for a while rather than locking the account.
 
 Histories of attempts, such as which IP addresses failed against which account, are not kept in the database. Finding patterns in them is the log service's job.

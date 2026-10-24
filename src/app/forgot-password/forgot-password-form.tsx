@@ -12,7 +12,8 @@ import { SubmitButton } from "@/components/submit-button";
 
 interface ForgotPasswordState {
   sent: boolean;
-  failed: boolean;
+  /** Why no link was sent: refused by the rate limit, or anything else. */
+  failure?: "too-many-attempts" | "error";
 }
 
 /** Renders the form, then a confirmation once a link was requested. */
@@ -26,14 +27,14 @@ export function ForgotPasswordForm() {
       // The emailed link leads to this page, with a token (reset-password/).
       redirectTo: "/reset-password",
     });
-    if (error) console.error("Requesting a password reset failed", error);
-    return { sent: !error, failed: Boolean(error) };
+    if (!error) return { sent: true };
+    // Refused by the rate limit (src/auth/auth.ts): HTTP 429, no code.
+    if (error.status === 429) return { sent: false, failure: "too-many-attempts" };
+    console.error("Requesting a password reset failed", error);
+    return { sent: false, failure: "error" };
   }
 
-  const [state, formAction, pending] = useActionState(requestLink, {
-    sent: false,
-    failed: false,
-  });
+  const [state, formAction, pending] = useActionState(requestLink, { sent: false });
 
   if (state.sent) {
     return (
@@ -48,7 +49,9 @@ export function ForgotPasswordForm() {
     <form action={formAction} className="flex flex-col gap-4">
       <FormField label="Email" name="email" type="email" autoComplete="email" required />
       <FormMessage>
-        {state.failed && "Something went wrong. Please try again in a moment."}
+        {state.failure === "too-many-attempts" &&
+          "Too many attempts. Please wait a few minutes and try again."}
+        {state.failure === "error" && "Something went wrong. Please try again in a moment."}
       </FormMessage>
       <SubmitButton pending={pending} pendingLabel="Sending…">
         Send reset link

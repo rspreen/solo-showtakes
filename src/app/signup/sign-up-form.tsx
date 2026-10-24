@@ -12,17 +12,16 @@ import { useActionState } from "react";
 import { FormField } from "@/components/form-field";
 import { FormMessage } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
-import { type SignUpFailure } from "@/core/people/accounts.operations";
 import {
   maximumPasswordLength,
   minimumPasswordLength,
 } from "@/core/people/password";
-import { type SignUpFormState, signUpAction } from "./actions";
+import { type SignUpFormFailure, type SignUpFormState, signUpAction } from "./actions";
 
 type Field = "email" | "password" | "handle" | "form";
 
 /** Where each failure is shown, and what it says. */
-const failureMessages: Record<SignUpFailure, { field: Field; message: string }> = {
+const failureMessages: Record<SignUpFormFailure, { field: Field; message: string }> = {
   "invalid-email": { field: "email", message: "Enter a valid email address." },
   "not-invited": {
     field: "form",
@@ -46,6 +45,10 @@ const failureMessages: Record<SignUpFailure, { field: Field; message: string }> 
     message: "Do not use two periods in a row.",
   },
   "handle-taken": { field: "handle", message: "That handle is taken. Try another." },
+  "too-many-attempts": {
+    field: "form",
+    message: "Too many attempts. Please wait a few minutes and try again.",
+  },
 };
 
 const initialState: SignUpFormState = { values: { email: "", handle: "" } };
