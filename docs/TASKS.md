@@ -63,12 +63,13 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
    - Resend Free plan (3,000 emails a month, at most 100 a day), region us-east-1, sending domain `mail.showtakes.com` (verified 2026-10-20) with the default return-path (`send`), so `MAIL_FROM=noreply@mail.showtakes.com`. DMARC `p=none` on showtakes.com. The API key has sending access only, limited to that domain; open and click tracking stay off, since tracking rewrites the verification and reset links.
    - Preview deployments each have their own address, so `BETTER_AUTH_URL` cannot be one fixed value there; take it from Vercel's `VERCEL_BRANCH_URL` or `VERCEL_URL` on previews (a code change in `src/wiring/create-services-from-environment.ts`), and give previews their own `BETTER_AUTH_SECRET`.
    - (decided 2026-10-21) Migrations run in the Vercel build, before `next build`, over Neon's direct connection; each preview migrates its own Neon branch (ADR 0008, `vercel.json`).
-   - (linked 2026-10-21) Neon integration on the Vercel project: it sets `DATABASE_URL` and `DATABASE_URL_UNPOOLED` for Production and Development, matching what `drizzle.config.ts` and the site read. Still to check: the `DATABASE_URL` host contains `-pooler` and the unpooled one does not; preview deployments receive their own branch's values (none are listed for Preview until a preview deploys); and, later, mark the two production values Sensitive after rotating the database password (Vercel suggests it).
+   - (linked 2026-10-21) Neon integration on the Vercel project: it sets `DATABASE_URL` and `DATABASE_URL_UNPOOLED` for Production and Development, matching what `drizzle.config.ts` and the site read; `DATABASE_URL` is the pooled address and `DATABASE_URL_UNPOOLED` the direct one (checked 2026-10-21). Still to check: preview deployments receive their own branch's values (none are listed for Preview until a preview deploys).
    - Decide whether preview deployments send real email (a second Resend key, or not at all), so a branch test never emails real testers.
    - (done 2026-10-20) Clean up records Cloudflare copied from Porkbun: delete the root MX (Porkbun forwarding) and the `*` wildcard, and set the root SPF to `v=spf1 -all`. The root and `www` records still point at Porkbun's parking page until Vercel's replace them.
    - Vercel Hobby plan (free; non-commercial use only). Runtime logs are kept for 1 hour and there is no log drain, which is accepted during invite-only testing. Set `LOG_LEVEL` in the host's settings (it is required), and leave `LOG_FILE` unset.
-   - Check that Vercel's `x-forwarded-for` holds the real client IP address in logs (`src/logging/request-context.ts`).
-   - Done when: production signup works end to end on the real domain.
+   - (done 2026-10-23) Check that Vercel's `x-forwarded-for` holds the real client IP address in logs (`src/logging/request-context.ts`): a production `auth.login.succeeded` line showed the right address.
+   - (done 2026-10-23) showtakes.com attached to Vercel (`www` and `showtakes.vercel.app` redirect to it with 308); the first Member signed up, verified, and was made Admin in production with `pnpm allowlist:add` and `pnpm admin:promote`.
+   - Done when: production signup works end to end on the real domain. (Met 2026-10-23; the items not marked done above remain.)
 
 9. **Backups**
    - Point-in-time restore enabled on the database.
@@ -194,6 +195,7 @@ Minor improvements, picked up whenever convenient.
 - Handle and display-name change limits, and the 14-day hold on an old handle
 - Move to Vercel Pro (before public signup or the first revenue, whichever comes first), and set up a log drain to a log service (Axiom, Better Stack, or similar) with a retention period of 30 to 90 days (ADR 0006)
 - Move to Resend Pro ($20 a month for 50,000 emails) at the same time, since the Free plan's 100 a day stops sending once reached
+- Rotate the Neon database password, and mark the production `DATABASE_URL` and `DATABASE_URL_UNPOOLED` as Sensitive in Vercel (Vercel suggests it)
 - An address that receives mail (such as `hello@showtakes.com` through Cloudflare Email Routing), for the privacy policy and takedown contact; site mail comes from `noreply`
 - Per-account login throttling: after about 10 failures in 15 minutes, refuse that email's logins for 15 minutes with the usual "do not match" message. A counter in the database, and no hard lockout (ADR 0006).
 - Email the Member when their password changes
