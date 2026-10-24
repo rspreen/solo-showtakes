@@ -79,7 +79,8 @@ export function SignUpForm() {
         minLength={2}
         maxLength={30}
         defaultValue={state.values.handle}
-        hint="Your public name, like @roger. Letters, numbers, periods, and underscores."
+        prefix="@"
+        hint="Your public name on Showtakes. Letters, numbers, periods, and underscores."
         error={errorFor("handle")}
       />
       <FormField

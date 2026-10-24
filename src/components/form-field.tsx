@@ -7,7 +7,8 @@
  * readers announce them, and an error marks the input `aria-invalid`, which
  * the shadcn styles show in red. Password fields get a show/hide button,
  * and optionally a check mark once the password meets the rules
- * (password-input.tsx).
+ * (password-input.tsx). Text fields can show a fixed prefix inside the
+ * input, such as the "@" before a handle.
  */
 import { Input } from "@/shadcn/components/ui/input";
 import { Label } from "@/shadcn/components/ui/label";
@@ -32,6 +33,12 @@ export interface FormFieldProps {
    * password meets the rules. Ignored for other types.
    */
   showWhenPasswordAcceptable?: boolean;
+  /**
+   * Text shown inside the start of a text input, which is not part of the
+   * value, such as "@" for a handle: it shows the value's role and that
+   * the prefix need not be typed. Ignored for passwords.
+   */
+  prefix?: string;
 }
 
 /** Renders a label, an input, and its hint or error. */
@@ -43,6 +50,7 @@ export function FormField({
   error,
   defaultValue,
   showWhenPasswordAcceptable,
+  prefix,
   ...inputProps
 }: FormFieldProps) {
   const describedById = `${name}-description`;
@@ -66,6 +74,18 @@ export function FormField({
           showWhenAcceptable={showWhenPasswordAcceptable}
           {...sharedInputProps}
         />
+      ) : prefix ? (
+        <div className="relative">
+          {/* Decoration only: hidden from screen readers, and clicks pass
+              through to the input. The input's left padding makes room. */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 left-2.5 flex items-center text-base text-muted-foreground md:text-sm"
+          >
+            {prefix}
+          </span>
+          <Input key={defaultValue ?? ""} type={type} className="pl-6" {...sharedInputProps} />
+        </div>
       ) : (
         <Input key={defaultValue ?? ""} type={type} {...sharedInputProps} />
       )}

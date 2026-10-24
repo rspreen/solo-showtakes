@@ -179,6 +179,8 @@ Domain terms are defined in [CONTEXT.md](../CONTEXT.md); architecture decisions 
 
 Minor improvements, picked up whenever convenient.
 
+- (done 2026-10-24) Signup handle field: show "@" inside the start of the input, so people see it is their @handle and do not type the "@" themselves.
+- Handle field: also accept a typed leading "@" by dropping it, rather than refusing it as an invalid character (today a deliberate test in `src/core/people/handle.test.ts` refuses it).
 - Dependency vulnerabilities: `pnpm audit` (2026-10-24) still reports high and moderate findings in packages we do not depend on directly (body-parser, undici, zod, esbuild, fast-uri, ip-address). Check which reach production, update what the 7-day minimum release age allows, and consider Dependabot alerts.
 - (done 2026-10-19) Signup password field: show a standard "acceptable" indicator, such as a check mark, once the typed password meets the rules (12 to 128 characters, from `src/core/people/password.ts`), so people know they can stop editing it. Also on the reset page's new-password field.
 
